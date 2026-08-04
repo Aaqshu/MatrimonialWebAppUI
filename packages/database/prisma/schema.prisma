@@ -1,10 +1,10 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../../apps/api/src/generated/prisma-client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("ADMIN_DATABASE_URL")
 }
 
 model AdminUser {
