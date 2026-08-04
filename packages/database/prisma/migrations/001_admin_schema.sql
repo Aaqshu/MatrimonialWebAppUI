@@ -98,12 +98,12 @@ CREATE TABLE IF NOT EXISTS "Tenants" (
     "CustomDomain"        VARCHAR(255)  UNIQUE,                   -- optional vanity domain, verified separately
     "LogoUrl"             VARCHAR(500),
     "DatabaseName"        VARCHAR(100)  NOT NULL,
-    "DatabaseServer"      VARCHAR(200)  NOT NULL,
+    "DatabaseServer"      VARCHAR(200),
     -- SECURITY: do NOT store a raw connection string / password here.
     -- Store a reference (e.g. AWS Secrets Manager ARN / HashiCorp Vault path)
     -- and resolve the real credentials at runtime. A single leaked row in
     -- this table would otherwise expose every tenant's database.
-    "ConnectionSecretRef" VARCHAR(500)  NOT NULL,
+    "ConnectionSecretRef" VARCHAR(500),
     "Status"              tenant_status NOT NULL DEFAULT 'provisioning',
     "IsActive"            BOOLEAN       NOT NULL DEFAULT TRUE,
     "CreatedBy"           UUID,
