@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("ADMIN_DATABASE_URL")
+}
+
+model AdminUser {
+  id        String   @id @default(uuid()) @map("AdminId") @db.Uuid
+  userName  String   @unique @map("AdminUserName") @db.VarChar(100)
+  password  String   @map("Password") @db.VarChar(255)
+  firstName String?  @map("FirstName") @db.VarChar(100)
+  lastName  String?  @map("LastName") @db.VarChar(100)
+  email     String   @unique @map("Email") @db.VarChar(200)
+  phone     String?  @map("Phone") @db.VarChar(20)
+  role      String   @default("support") @map("Role") @db.VarChar(50)
+  isActive  Boolean  @default(true) @map("IsActive")
+  lastLogin DateTime? @map("LastLogin") @db.Timestamp
+  createdAt DateTime @default(now()) @map("CreatedOn")
+  updatedAt DateTime @updatedAt @map("UpdatedOn")
+
+  @@map("AdminUsers")
+}
+
+model Tenant {
+  id                  String   @id @default(uuid()) @map("TenantId") @db.Uuid
+  tenantCode          String   @unique @map("TenantCode") @db.VarChar(50)
+  companyName         String   @map("CompanyName") @db.VarChar(200)
+  ownerName           String?  @map("OwnerName") @db.VarChar(150)
+  email               String   @map("Email") @db.VarChar(200)
+  phone               String?  @map("Phone") @db.VarChar(20)
+  address             String?  @map("Address") @db.VarChar(500)
+  city                String?  @map("City") @db.VarChar(100)
+  state               String?  @map("State") @db.VarChar(100)
+  country             String?  @default("India") @map("Country") @db.VarChar(100)
+  zipCode             String?  @map("ZipCode") @db.VarChar(20)
+  customDomain        String?  @unique @map("CustomDomain") @db.VarChar(255)
+  logoUrl             String?  @map("LogoUrl") @db.VarChar(500)
+  databaseName        String   @map("DatabaseName") @db.VarChar(100)
+  databaseServer      String   @map("DatabaseServer") @db.VarChar(200)
+  connectionSecretRef String   @map("ConnectionSecretRef") @db.VarChar(500)
+  status              String   @default("provisioning") @map("Status") @db.VarChar(50)
+  isActive            Boolean  @default(true) @map("IsActive")
+  createdBy           String?  @map("CreatedBy") @db.Uuid
+  createdAt           DateTime @default(now()) @map("CreatedOn")
+  updatedAt           DateTime @updatedAt @map("UpdatedOn")
+
+  themeConfig  ThemeConfig?
+  featureFlags FeatureFlags?
+  subscriptions  TenantSubscription[]
+  payments       Payment[]
+  provisioningLogs TenantProvisioningLog[]
+
+  @@map("Tenants")
+}
+
+model ThemeConfig {
+  tenantId       String   @id @map("TenantId") @db.Uuid
+  businessName   String   @map("BusinessName") @db.VarChar(150)
+  logoUrl        String?  @map("LogoUrl") @db.VarChar(500)
+  primaryColor   String   @default("#1D9E75") @map("PrimaryColor") @db.VarChar(7)
+  secondaryColor String   @default("#0F6E56") @map("SecondaryColor") @db.VarChar(7)
+  fontFamily     String   @default("Inter") @map("FontFamily") @db.VarChar(100)
+  tagline        String?  @map("Tagline") @db.VarChar(255)
+  contactEmail   String?  @map("ContactEmail") @db.VarChar(200)
+  contactPhone   String?  @map("ContactPhone") @db.VarChar(20)
+  updatedAt      DateTime @updatedAt @map("UpdatedOn")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("ThemeConfigs")
+}
+
+model FeatureFlags {
+  tenantId               String   @id @map("TenantId") @db.Uuid
+  matchingEnabled        Boolean  @default(true) @map("MatchingEnabled")
+  videoCallEnabled       Boolean  @default(false) @map("VideoCallEnabled")
+  kundliMatchingEnabled  Boolean  @default(false) @map("KundliMatchingEnabled")
+  maxPhotosPerProfile    Int      @default(6) @map("MaxPhotosPerProfile")
+  customFlags            Json?    @map("CustomFlags")
+  updatedAt              DateTime @updatedAt @map("UpdatedOn")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("FeatureFlags")
+}
+
+model SubscriptionPlan {
+  id          String   @id @default(uuid()) @map("PlanId") @db.Uuid
+  planName    String   @map("PlanName") @db.VarChar(100)
+  description String?  @map("Description") @db.VarChar(1000)
+  price       Decimal  @map("Price") @db.Decimal(10, 2)
+  billingCycle String  @default("monthly") @map("BillingCycle") @db.VarChar(20)
+  isActive    Boolean  @default(true) @map("IsActive")
+  createdAt   DateTime @default(now()) @map("CreatedOn")
+
+  subscriptions TenantSubscription[]
+
+  @@map("SubscriptionPlans")
+}
+
+model TenantSubscription {
+  id                 String   @id @default(uuid()) @map("TenantSubscriptionId") @db.Uuid
+  tenantId           String   @map("TenantId") @db.Uuid
+  planId             String   @map("PlanId") @db.Uuid
+  startDate          DateTime @map("StartDate") @db.Date
+  endDate            DateTime? @map("EndDate") @db.Date
+  nextBillingDate    DateTime? @map("NextBillingDate") @db.Date
+  amount             Decimal  @map("Amount") @db.Decimal(10, 2)
+  paymentStatus      String   @default("pending") @map("PaymentStatus") @db.VarChar(20)
+  subscriptionStatus String   @default("active") @map("SubscriptionStatus") @db.VarChar(20)
+  createdAt          DateTime @default(now()) @map("CreatedOn")
+
+  tenant Tenant             @relation(fields: [tenantId], references: [id])
+  plan   SubscriptionPlan   @relation(fields: [planId], references: [id])
+  payments Payment[]
+
+  @@map("TenantSubscriptions")
+}
+
+model Payment {
+  id              String   @id @default(uuid()) @map("PaymentId") @db.Uuid
+  subscriptionId  String   @map("SubscriptionId") @db.Uuid
+  tenantId        String   @map("TenantId") @db.Uuid
+  amount          Decimal  @map("Amount") @db.Decimal(10, 2)
+  currency        String   @default("INR") @map("Currency") @db.VarChar(3)
+  paymentMethod   String?  @map("PaymentMethod") @db.VarChar(50)
+  transactionId   String?  @map("TransactionId") @db.VarChar(255)
+  invoiceNumber   String?  @map("InvoiceNumber") @db.VarChar(100)
+  paymentGateway  String?  @map("PaymentGateway") @db.VarChar(50)
+  status          String   @default("pending") @map("Status") @db.VarChar(20)
+  paidOn          DateTime? @map("PaidOn") @db.Timestamp
+
+  subscription TenantSubscription @relation(fields: [subscriptionId], references: [id])
+  tenant       Tenant             @relation(fields: [tenantId], references: [id])
+
+  @@map("Payments")
+}
+
+model EmailTemplate {
+  id           String   @id @default(uuid()) @map("TemplateId") @db.Uuid
+  templateName String   @unique @map("TemplateName") @db.VarChar(100)
+  subject      String   @map("Subject") @db.VarChar(255)
+  body         String   @map("Body") @db.Text
+  isActive     Boolean  @default(true) @map("IsActive")
+
+  @@map("EmailTemplates")
+}
+
+model SystemSetting {
+  id           String  @id @default(uuid()) @map("SettingId") @db.Uuid
+  settingKey   String  @unique @map("SettingKey") @db.VarChar(100)
+  settingValue String? @map("SettingValue") @db.VarChar(1000)
+
+  @@map("SystemSettings")
+}
+
+model TenantProvisioningLog {
+  id           String   @id @default(uuid()) @map("ProvisioningLogId") @db.Uuid
+  tenantId     String   @map("TenantId") @db.Uuid
+  step         String   @map("Step") @db.VarChar(100)
+  status       String   @default("pending") @map("Status") @db.VarChar(20)
+  errorMessage String?  @map("ErrorMessage") @db.Text
+  createdAt    DateTime @default(now()) @map("CreatedOn")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("TenantProvisioningLog")
+}
