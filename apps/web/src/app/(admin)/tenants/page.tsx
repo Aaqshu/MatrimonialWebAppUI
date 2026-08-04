@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,6 +25,7 @@ interface Tenant {
 }
 
 export default function TenantsPage() {
+  const router = useRouter();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ tenantCode: '', companyName: '', ownerName: '', email: '', phone: '', city: '', state: '', country: 'India', databaseServer: '', connectionSecretRef: '' });
@@ -99,13 +101,13 @@ export default function TenantsPage() {
             </TableHeader>
             <TableBody>
               {tenants.map((t) => (
-                <TableRow key={t.id} className="border-gray-800">
-                  <TableCell className="font-mono text-sm">{t.tenantCode}</TableCell>
+                <TableRow key={t.id} className="border-gray-800 cursor-pointer" onClick={() => router.push(`/tenants/${t.id}`)}>
+                  <TableCell className="font-mono text-sm underline-offset-4 hover:underline">{t.tenantCode}</TableCell>
                   <TableCell>{t.companyName}</TableCell>
                   <TableCell>{t.ownerName}</TableCell>
                   <TableCell className="text-gray-400">{t.email}</TableCell>
                   <TableCell><Badge variant={t.status === 'active' ? 'default' : 'secondary'}>{t.status}</Badge></TableCell>
-                  <TableCell>
+                  <TableCell onClick={e => e.stopPropagation()}>
                     <Button variant="ghost" size="sm" onClick={() => handleToggle(t.id, t.isActive)}>
                       {t.isActive ? '🟢' : '🔴'}
                     </Button>
