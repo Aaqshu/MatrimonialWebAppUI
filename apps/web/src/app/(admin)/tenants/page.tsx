@@ -50,7 +50,7 @@ export default function TenantsPage() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Tenants</h2>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button>Add Tenant</Button></DialogTrigger>
+          <DialogTrigger render={<Button>Add Tenant</Button>} />
           <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-lg">
             <DialogHeader><DialogTitle>New Tenant</DialogTitle></DialogHeader>
             <form onSubmit={handleCreate} className="space-y-3">

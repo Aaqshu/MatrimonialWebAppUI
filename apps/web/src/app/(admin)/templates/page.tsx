@@ -38,7 +38,7 @@ export default function TemplatesPage() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Email Templates</h2>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button>Add Template</Button></DialogTrigger>
+          <DialogTrigger render={<Button>Add Template</Button>} />
           <DialogContent className="bg-gray-900 border-gray-700 text-white">
             <DialogHeader><DialogTitle>New Template</DialogTitle></DialogHeader>
             <form onSubmit={handleCreate} className="space-y-3">
