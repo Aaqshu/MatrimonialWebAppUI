@@ -102,7 +102,11 @@ export default function SubscriptionsPage() {
             <div>
               <Label>Tenant</Label>
               <Select value={form.TenantId} onValueChange={v => setForm({...form, TenantId: v ?? ''})}>
-                <SelectTrigger className="bg-gray-800 border-gray-700"><SelectValue placeholder="Select tenant" /></SelectTrigger>
+                <SelectTrigger className="bg-gray-800 border-gray-700">
+                  <SelectValue>
+                    {(v: string | null) => v ? (tenants.find(t => t.TenantId === v)?.CompanyName ?? v) : 'Select tenant'}
+                  </SelectValue>
+                </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700">
                   {tenants.map(t => <SelectItem key={t.TenantId} value={t.TenantId}>{t.CompanyName}</SelectItem>)}
                 </SelectContent>
@@ -111,7 +115,11 @@ export default function SubscriptionsPage() {
             <div>
               <Label>Plan</Label>
               <Select value={form.PlanId} onValueChange={handlePlanChange}>
-                <SelectTrigger className="bg-gray-800 border-gray-700"><SelectValue placeholder="Select plan" /></SelectTrigger>
+                <SelectTrigger className="bg-gray-800 border-gray-700">
+                  <SelectValue>
+                    {(v: string | null) => v ? (plans.find(p => p.PlanId === v)?.PlanName ?? v) : 'Select plan'}
+                  </SelectValue>
+                </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700">
                   {plans.map(p => <SelectItem key={p.PlanId} value={p.PlanId}>{p.PlanName} — ₹{p.Price}/{p.BillingCycle}</SelectItem>)}
                 </SelectContent>
