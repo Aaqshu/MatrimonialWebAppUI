@@ -26,7 +26,7 @@ interface Tenant {
 export default function TenantsPage() {
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ tenantCode: '', companyName: '', ownerName: '', email: '', phone: '', city: '', state: '', country: 'India', databaseName: '', databaseServer: '', connectionSecretRef: '' });
+  const [form, setForm] = useState({ tenantCode: '', companyName: '', ownerName: '', email: '', phone: '', city: '', state: '', country: 'India', databaseServer: '', connectionSecretRef: '' });
 
   const fetchTenants = () => api.get('/admin/tenants').then(({ data }) => setTenants(data)).catch(console.error);
 
@@ -36,7 +36,7 @@ export default function TenantsPage() {
     e.preventDefault();
     await api.post('/admin/tenants', form);
     setOpen(false);
-    setForm({ tenantCode: '', companyName: '', ownerName: '', email: '', phone: '', city: '', state: '', country: 'India', databaseName: '', databaseServer: '', connectionSecretRef: '' });
+    setForm({ tenantCode: '', companyName: '', ownerName: '', email: '', phone: '', city: '', state: '', country: 'India', databaseServer: '', connectionSecretRef: '' });
     fetchTenants();
   };
 
@@ -62,9 +62,8 @@ export default function TenantsPage() {
                 <div><Label>Phone</Label><Input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className="bg-gray-800 border-gray-700" /></div>
                 <div><Label>City</Label><Input value={form.city} onChange={e => setForm({...form, city: e.target.value})} className="bg-gray-800 border-gray-700" /></div>
                 <div><Label>State</Label><Input value={form.state} onChange={e => setForm({...form, state: e.target.value})} className="bg-gray-800 border-gray-700" /></div>
-                <div><Label>DB Name</Label><Input value={form.databaseName} onChange={e => setForm({...form, databaseName: e.target.value})} className="bg-gray-800 border-gray-700" required /></div>
-                <div><Label>DB Server</Label><Input value={form.databaseServer} onChange={e => setForm({...form, databaseServer: e.target.value})} className="bg-gray-800 border-gray-700" required /></div>
-                <div className="col-span-2"><Label>Secret Ref</Label><Input value={form.connectionSecretRef} onChange={e => setForm({...form, connectionSecretRef: e.target.value})} className="bg-gray-800 border-gray-700" required /></div>
+                <div><Label>DB Server <span className="text-gray-500">(optional)</span></Label><Input value={form.databaseServer} onChange={e => setForm({...form, databaseServer: e.target.value})} className="bg-gray-800 border-gray-700" /></div>
+                <div className="col-span-2"><Label>Secret Ref <span className="text-gray-500">(optional)</span></Label><Input value={form.connectionSecretRef} onChange={e => setForm({...form, connectionSecretRef: e.target.value})} className="bg-gray-800 border-gray-700" /></div>
               </div>
               <Button type="submit" className="w-full">Create Tenant</Button>
             </form>

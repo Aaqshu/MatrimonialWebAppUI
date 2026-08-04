@@ -21,10 +21,11 @@ export class TenantsController {
   @Post()
   async create(@Body() body: any) {
     const id = uuid();
+    const dbName = body.databaseName || `${body.tenantCode}_${(body.companyName || 'tenant').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`;
     const { rows } = await this.db.query(
       `INSERT INTO "Tenants" ("TenantId","TenantCode","CompanyName","OwnerName","Email","Phone","City","State","Country","DatabaseName","DatabaseServer","ConnectionSecretRef","Status")
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
-      [id, body.tenantCode, body.companyName, body.ownerName, body.email, body.phone, body.city, body.state, body.country || 'India', body.databaseName, body.databaseServer, body.connectionSecretRef, 'active']
+      [id, body.tenantCode, body.companyName, body.ownerName, body.email, body.phone, body.city, body.state, body.country || 'India', dbName, body.databaseServer || null, body.connectionSecretRef || null, 'active']
     );
     return rows[0];
   }
