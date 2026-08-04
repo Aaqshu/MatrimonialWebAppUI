@@ -9,8 +9,11 @@ import { Separator } from '@/components/ui/separator';
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: '📊' },
   { href: '/tenants', label: 'Tenants', icon: '🏢' },
+  { href: '/subscriptions', label: 'Subscriptions', icon: '🔁' },
+  { href: '/payments', label: 'Payments', icon: '💵' },
   { href: '/plans', label: 'Plans', icon: '💳' },
   { href: '/templates', label: 'Email Templates', icon: '📧' },
+  { href: '/admin-users', label: 'Admin Users', icon: '👤' },
   { href: '/settings', label: 'Settings', icon: '⚙️' },
 ];
 
