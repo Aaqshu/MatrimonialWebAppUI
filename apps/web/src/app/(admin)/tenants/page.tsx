@@ -55,7 +55,7 @@ export default function TenantsPage() {
   };
 
   const handleToggle = async (id: string, isActive: boolean) => {
-    await api.patch(`/admin/tenants/${id}`, { IsActive: !isActive });
+    await api.patch(`/admin/tenants/${id}`, { IsActive: !isActive, Status: !isActive ? 'active' : 'suspended' });
     fetchTenants();
   };
 
