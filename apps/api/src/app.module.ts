@@ -11,6 +11,9 @@ import { TemplatesModule } from './admin/templates/templates.module';
 import { SettingsModule } from './admin/settings/settings.module';
 import { ProvisioningModule } from './admin/provisioning/provisioning.module';
 import { DashboardModule } from './admin/dashboard/dashboard.module';
+import { AdminUsersModule } from './admin/admin-users/admin-users.module';
+import { SubscriptionsModule } from './admin/subscriptions/subscriptions.module';
+import { PaymentsModule } from './admin/payments/payments.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Module({
@@ -26,6 +29,9 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     SettingsModule,
     ProvisioningModule,
     DashboardModule,
+    AdminUsersModule,
+    SubscriptionsModule,
+    PaymentsModule,
   ],
   providers: [
     Reflector,
