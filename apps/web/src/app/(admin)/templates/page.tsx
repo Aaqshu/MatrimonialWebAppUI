@@ -28,7 +28,9 @@ export default function TemplatesPage() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [preview, setPreview] = useState('');
 
-  const fetch = () => api.get('/admin/email-templates').then(({ data }) => setTemplates(data)).catch(console.error);
+  const fetch = () => api.get('/admin/email-templates').then(({ data }) => setTemplates(data.map((t: any) => ({
+    id: t.TemplateId, templateName: t.TemplateName, subject: t.Subject, body: t.Body, isActive: t.IsActive,
+  })))).catch(console.error);
   useEffect(() => { fetch(); }, []);
 
   const openCreate = () => {
@@ -47,8 +49,9 @@ export default function TemplatesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editing) await api.patch(`/admin/email-templates/${editing.id}`, form);
-    else await api.post('/admin/email-templates', form);
+    const payload = { TemplateName: form.templateName, Subject: form.subject, Body: form.body };
+    if (editing) await api.patch(`/admin/email-templates/${editing.id}`, payload);
+    else await api.post('/admin/email-templates', payload);
     setOpen(false);
     fetch();
   };
@@ -60,7 +63,7 @@ export default function TemplatesPage() {
   };
 
   const handleToggle = async (t: Template) => {
-    await api.patch(`/admin/email-templates/${t.id}`, { isActive: !t.isActive });
+    await api.patch(`/admin/email-templates/${t.id}`, { IsActive: !t.isActive });
     fetch();
   };
 

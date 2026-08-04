@@ -18,10 +18,14 @@ export default function SettingsPage() {
   const [editing, setEditing] = useState<string | null>(null);
   const [value, setValue] = useState('');
 
-  useEffect(() => { api.get('/admin/settings').then(({ data }) => setSettings(data)).catch(console.error); }, []);
+  useEffect(() => {
+    api.get('/admin/settings').then(({ data }) => setSettings(data.map((s: any) => ({
+      id: s.SettingId, settingKey: s.SettingKey, settingValue: s.SettingValue,
+    })))).catch(console.error);
+  }, []);
 
   const handleSave = async (id: string) => {
-    await api.patch(`/admin/settings/${id}`, { settingValue: value });
+    await api.patch(`/admin/settings/${id}`, { SettingValue: value });
     setEditing(null);
     setSettings(settings.map(s => s.id === id ? { ...s, settingValue: value } : s));
   };

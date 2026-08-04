@@ -28,7 +28,21 @@ export default function TenantsPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ tenantCode: '', companyName: '', ownerName: '', email: '', phone: '', city: '', state: '', country: 'India', databaseServer: '', connectionSecretRef: '' });
 
-  const fetchTenants = () => api.get('/admin/tenants').then(({ data }) => setTenants(data)).catch(console.error);
+  const fetchTenants = () =>
+    api.get('/admin/tenants')
+      .then(({ data }) => setTenants(data.map((t: any) => ({
+        id: t.TenantId,
+        tenantCode: t.TenantCode,
+        companyName: t.CompanyName,
+        ownerName: t.OwnerName,
+        email: t.Email,
+        phone: t.Phone,
+        city: t.City,
+        state: t.State,
+        status: t.Status,
+        isActive: t.IsActive,
+      }))))
+      .catch(console.error);
 
   useEffect(() => { fetchTenants(); }, []);
 
@@ -41,7 +55,7 @@ export default function TenantsPage() {
   };
 
   const handleToggle = async (id: string, isActive: boolean) => {
-    await api.patch(`/admin/tenants/${id}`, { isActive: !isActive });
+    await api.patch(`/admin/tenants/${id}`, { IsActive: !isActive });
     fetchTenants();
   };
 

@@ -29,7 +29,9 @@ export default function PlansPage() {
   const [editing, setEditing] = useState<Plan | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
 
-  const fetchPlans = () => api.get('/admin/plans').then(({ data }) => setPlans(data)).catch(console.error);
+  const fetchPlans = () => api.get('/admin/plans').then(({ data }) => setPlans(data.map((p: any) => ({
+    id: p.PlanId, planName: p.PlanName, description: p.Description, price: Number(p.Price), billingCycle: p.BillingCycle, isActive: p.IsActive,
+  })))).catch(console.error);
   useEffect(() => { fetchPlans(); }, []);
 
   const openCreate = () => {
@@ -46,7 +48,12 @@ export default function PlansPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = { ...form, price: parseFloat(form.price) };
+    const payload = {
+      PlanName: form.planName,
+      Description: form.description || null,
+      Price: parseFloat(form.price),
+      BillingCycle: form.billingCycle,
+    };
     if (editing) await api.patch(`/admin/plans/${editing.id}`, payload);
     else await api.post('/admin/plans', payload);
     setOpen(false);
@@ -60,7 +67,7 @@ export default function PlansPage() {
   };
 
   const handleToggle = async (p: Plan) => {
-    await api.patch(`/admin/plans/${p.id}`, { isActive: !p.isActive });
+    await api.patch(`/admin/plans/${p.id}`, { IsActive: !p.isActive });
     fetchPlans();
   };
 
