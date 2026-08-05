@@ -3,6 +3,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SiteController } from './site.controller';
 import { SiteProfileController } from './profile.controller';
+import { SitePhotosController } from './photos.controller';
+import { SiteVerificationController } from './verification.controller';
+import { SitePrivacyController } from './privacy.controller';
 import { TenantDbService } from './tenant-db.service';
 import { OtpDeliveryService } from './otp-delivery.service';
 
@@ -16,7 +19,8 @@ import { OtpDeliveryService } from './otp-delivery.service';
       }),
     }),
   ],
-  controllers: [SiteController, SiteProfileController],
+  controllers: [SiteController, SiteProfileController, SitePhotosController, SiteVerificationController, SitePrivacyController],
   providers: [TenantDbService, OtpDeliveryService],
+  exports: [TenantDbService],
 })
 export class SiteModule {}
