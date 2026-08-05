@@ -17,23 +17,27 @@ export class VerificationsController {
 
   @Get()
   async list(@Query('tenantDbName') tenantDbName?: string) {
-    const dbName = tenantDbName || (await this.demoTenantDbName());
+    const dbName = tenantDbName || (await this.firstExistingTenantDb());
     if (!dbName) return [];
     const pool = this.tenantDb.getDb(dbName);
-    const { rows } = await pool.query(
-      `SELECT vr."VerificationId", vr."UserId", vr."DocType", vr."DocReference",
-              vr."Status", vr."CreatedOn", u."FirstName", u."Phone"
-       FROM "VerificationRequests" vr
-       JOIN "Users" u ON u."UserId" = vr."UserId"
-       ORDER BY vr."CreatedOn" DESC`,
-    );
-    return rows;
+    try {
+      const { rows } = await pool.query(
+        `SELECT vr."VerificationId", vr."UserId", vr."DocType", vr."DocReference",
+                vr."Status", vr."CreatedOn", u."FirstName", u."Phone"
+         FROM "VerificationRequests" vr
+         JOIN "Users" u ON u."UserId" = vr."UserId"
+         ORDER BY vr."CreatedOn" DESC`,
+      );
+      return rows;
+    } catch {
+      return [];
+    }
   }
 
   @Patch(':id')
   async review(@Param('id') id: string, @Body() body: any, @Query('tenantDbName') tenantDbName?: string) {
     if (!['approved', 'rejected'].includes(body.Status)) throw new NotFoundException('Invalid status');
-    const dbName = tenantDbName || (await this.demoTenantDbName());
+    const dbName = tenantDbName || (await this.firstExistingTenantDb());
     if (!dbName) throw new NotFoundException('No tenant DB');
     const pool = this.tenantDb.getDb(dbName);
     const { rows } = await pool.query(
@@ -45,11 +49,20 @@ export class VerificationsController {
     return rows[0];
   }
 
-  // First tenant that has a DatabaseName set — good enough for the demo.
-  private async demoTenantDbName(): Promise<string | null> {
+  // First tenant whose DB actually exists — skip seeds that were never provisioned.
+  private async firstExistingTenantDb(): Promise<string | null> {
     const { rows } = await this.db.query(
-      `SELECT "DatabaseName" FROM "Tenants" WHERE "DatabaseName" IS NOT NULL ORDER BY "CreatedOn" LIMIT 1`,
+      `SELECT "DatabaseName" FROM "Tenants" WHERE "DatabaseName" IS NOT NULL ORDER BY "CreatedOn"`,
     );
-    return rows[0]?.DatabaseName ?? null;
+    for (const row of rows) {
+      try {
+        const pool = this.tenantDb.getDb(row.DatabaseName);
+        await pool.query('SELECT 1');
+        return row.DatabaseName;
+      } catch {
+        continue;
+      }
+    }
+    return null;
   }
 }
