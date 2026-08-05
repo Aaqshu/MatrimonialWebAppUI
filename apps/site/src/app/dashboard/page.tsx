@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { ArrowRight, HeartHandshake, ImagePlus, Lock, LogOut, ShieldCheck, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, HeartHandshake, ImagePlus, Lock, LogOut, SearchIcon, ShieldCheck, Sparkles, CheckCircle2 } from 'lucide-react';
 
 const TENANT = 'provision-test_provisiontestmatrimony';
 
@@ -20,6 +20,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [completion, setCompletion] = useState<number | null>(null);
   const [hasProfile, setHasProfile] = useState(false);
+  const [pendingInterests, setPendingInterests] = useState(0);
 
   useEffect(() => {
     api.get('/site/me')
@@ -31,6 +32,12 @@ export default function DashboardPage() {
         if (res?.data?.profile) {
           setHasProfile(true);
           setCompletion(res.data.profile.ProfileCompletionPercent ?? 0);
+        }
+        return api.get(`/site/matches/${TENANT}`).catch(() => null);
+      })
+      .then((m: any) => {
+        if (m?.data?.received) {
+          setPendingInterests(m.data.received.filter((r: any) => r.Status === 'pending').length);
         }
       })
       .catch(() => { window.location.href = '/'; });
@@ -137,9 +144,38 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        <div className="mt-6 rounded-xl border border-dashed border-white/15 bg-white/[0.02] p-8 text-center">
-          <Sparkles className="mx-auto size-6 text-emerald-400/60" />
-          <p className="mt-3 text-white/50">Daily matches, chat &amp; more — coming in the next phase</p>
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Link href="/matches" className="block rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/10 to-transparent p-6 transition-all hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-500 text-emerald-950">
+                  <HeartHandshake className="size-5" />
+                </div>
+                <div>
+                  <p className="font-medium">Your matches</p>
+                  <p className="text-sm text-white/50">
+                    {pendingInterests > 0 ? `${pendingInterests} new interest${pendingInterests > 1 ? 's' : ''} waiting` : 'No new interests yet'}
+                  </p>
+                </div>
+              </div>
+              {pendingInterests > 0 && (
+                <span className="flex size-7 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-emerald-950">
+                  {pendingInterests}
+                </span>
+              )}
+            </div>
+          </Link>
+          <Link href="/search" className="block rounded-2xl border border-white/8 bg-white/[0.03] p-6 transition-all hover:border-white/20">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-white/5 text-white/60">
+                <SearchIcon className="size-5" />
+              </div>
+              <div>
+                <p className="font-medium">Find matches</p>
+                <p className="text-sm text-white/50">Search profiles by religion, city &amp; more</p>
+              </div>
+            </div>
+          </Link>
         </div>
       </div>
     </div>

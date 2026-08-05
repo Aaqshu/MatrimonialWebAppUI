@@ -6,6 +6,8 @@ import { SiteProfileController } from './profile.controller';
 import { SitePhotosController } from './photos.controller';
 import { SiteVerificationController } from './verification.controller';
 import { SitePrivacyController } from './privacy.controller';
+import { SiteSearchController } from './search.controller';
+import { SiteDiscoveryController } from './discovery.controller';
 import { TenantDbService } from './tenant-db.service';
 import { OtpDeliveryService } from './otp-delivery.service';
 
@@ -19,7 +21,7 @@ import { OtpDeliveryService } from './otp-delivery.service';
       }),
     }),
   ],
-  controllers: [SiteController, SiteProfileController, SitePhotosController, SiteVerificationController, SitePrivacyController],
+  controllers: [SiteController, SiteProfileController, SitePhotosController, SiteVerificationController, SitePrivacyController, SiteSearchController, SiteDiscoveryController],
   providers: [TenantDbService, OtpDeliveryService],
   exports: [TenantDbService],
 })
