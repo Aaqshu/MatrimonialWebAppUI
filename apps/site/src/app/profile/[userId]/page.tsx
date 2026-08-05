@@ -123,23 +123,19 @@ export default function PublicProfilePage() {
         </div>
       </nav>
 
-      <div className="mx-auto max-w-4xl px-6 py-8">
+      <div className="mx-auto max-w-4xl px-6 py-10">
         {/* Hero */}
         <div className="overflow-hidden rounded-2xl border border-white/8 bg-gradient-to-br from-white/[0.04] to-transparent">
-          <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start">
+          <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start sm:p-7">
             <div className="relative mx-auto sm:mx-0">
               {photo ? (
-                <img src={photo} alt={prof.FirstName} className="size-40 rounded-2xl border border-white/10 object-cover" />
+                <img src={photo} alt={prof.FirstName} className="size-40 rounded-2xl border border-white/10 object-cover shadow-lg shadow-black/20" />
               ) : (
-                <div className="flex size-40 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-500/20 to-amber-500/20 text-4xl font-semibold">
+                <div className="flex size-40 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-500/20 to-amber-500/20 text-4xl font-semibold shadow-lg shadow-black/20">
                   {initials}
                 </div>
               )}
-              {prof.MatchPercent !== null && (
-                <div className="absolute -bottom-2 -right-2 flex size-12 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-950 text-xs font-bold text-emerald-300 shadow-lg">
-                  {prof.MatchPercent}%
-                </div>
-              )}
+              {prof.MatchPercent !== null && <MatchRing percent={prof.MatchPercent} />}
             </div>
             <div className="flex-1 text-center sm:text-left">
               <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
@@ -150,17 +146,17 @@ export default function PublicProfilePage() {
                   </span>
                 )}
               </div>
-              <p className="mt-1 flex items-center justify-center gap-1.5 text-sm text-white/50 sm:justify-start">
+              <p className="mt-2 flex items-center justify-center gap-1.5 text-sm text-white/50 sm:justify-start">
                 <Cake className="size-4" /> {prof.Age} yrs · {prof.Height} ft · {prof.MaritalStatus?.replace('_', ' ')}
               </p>
-              <p className="mt-0.5 flex items-center justify-center gap-1.5 text-sm text-white/50 sm:justify-start">
+              <p className="mt-1 flex items-center justify-center gap-1.5 text-sm text-white/50 sm:justify-start">
                 <MapPin className="size-4" /> {prof.City}{prof.State ? `, ${prof.State}` : ''}
               </p>
               <div className="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
                 <button
                   onClick={() => act('interest', () => api.post(`/site/interests/${TENANT}`, { toUserId: prof.UserId }))}
                   disabled={!!busy}
-                  className="flex cursor-pointer items-center gap-1.5 rounded-full bg-emerald-500 px-5 py-2 text-sm font-medium text-emerald-950 transition-colors hover:bg-emerald-400 disabled:cursor-wait disabled:opacity-50"
+                  className="flex cursor-pointer items-center gap-1.5 rounded-full bg-emerald-500 px-5 py-2 text-sm font-medium text-emerald-950 shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-400 hover:shadow-emerald-500/30 disabled:cursor-wait disabled:opacity-50 disabled:shadow-none"
                 >
                   <Heart className="size-4" /> Send Interest
                 </button>
@@ -170,7 +166,7 @@ export default function PublicProfilePage() {
                     : api.post(`/site/favorites/${TENANT}/${prof.UserId}`))}
                   disabled={!!busy}
                   className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-5 py-2 text-sm font-medium transition-colors disabled:cursor-wait disabled:opacity-50 ${
-                    prof.IsFavorite ? 'border-rose-500/50 bg-rose-500/15 text-rose-300' : 'border-white/15 bg-white/5 text-white/70 hover:border-white/30'
+                    prof.IsFavorite ? 'border-rose-500/50 bg-rose-500/15 text-rose-300' : 'border-white/15 bg-white/5 text-white/70 hover:border-white/30 hover:text-white'
                   }`}
                 >
                   <Heart className={`size-4 ${prof.IsFavorite ? 'fill-rose-400 text-rose-400' : ''}`} />
@@ -180,7 +176,7 @@ export default function PublicProfilePage() {
                   <button
                     onClick={() => act('block', () => api.post(`/site/block/${TENANT}/${prof.UserId}`))}
                     disabled={!!busy}
-                    className="flex cursor-pointer items-center gap-1.5 rounded-full border border-white/10 px-5 py-2 text-sm font-medium text-white/40 transition-colors hover:border-red-500/40 hover:text-red-300 disabled:cursor-wait disabled:opacity-50"
+                    className="flex cursor-pointer items-center gap-1.5 rounded-full border border-transparent px-5 py-2 text-sm font-medium text-white/35 transition-colors hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300 disabled:cursor-wait disabled:opacity-50"
                   >
                     <ShieldAlert className="size-4" /> Block
                   </button>
@@ -220,7 +216,7 @@ export default function PublicProfilePage() {
             <Row k="Hobbies" v={prof.Hobbies} />
             <Row k="Languages" v={prof.LanguagesKnown} />
           </Section>
-          <Section icon={<Users className="size-4" />} title="About me">
+          <Section icon={<Users className="size-4" />} title="About me" className="sm:col-span-2">
             <p className="text-sm leading-relaxed text-white/60">{prof.AboutMe || '—'}</p>
           </Section>
         </div>
@@ -236,23 +232,53 @@ export default function PublicProfilePage() {
   );
 }
 
-function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+function Section({ icon, title, children, className = '' }: { icon: React.ReactNode; title: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5">
-      <div className="flex items-center gap-2 text-white/50">
+    <div className={`rounded-2xl border border-white/8 bg-white/[0.03] p-5 transition-colors hover:border-white/15 ${className}`}>
+      <div className="flex items-center gap-2 text-white/45">
         {icon}
-        <h2 className="text-xs font-medium uppercase tracking-wide">{title}</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-wide">{title}</h2>
       </div>
-      <div className="mt-3 space-y-2">{children}</div>
+      <div className="mt-3.5 space-y-2.5">{children}</div>
     </div>
   );
 }
 
 function Row({ k, v }: { k: string; v: string | undefined }) {
   return (
-    <div className="flex items-baseline justify-between gap-4">
+    <div className="flex items-baseline justify-between gap-4 border-b border-white/[0.04] pb-2 last:border-0 last:pb-0">
       <span className="text-xs text-white/40">{k}</span>
       <span className="text-right text-sm text-white/80 capitalize">{v || '—'}</span>
+    </div>
+  );
+}
+
+function MatchRing({ percent }: { percent: number }) {
+  const size = 56;
+  const stroke = 4;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference * (1 - Math.min(100, Math.max(0, percent)) / 100);
+  const tier = percent >= 75 ? 'high' : percent >= 50 ? 'mid' : 'low';
+  const ringColor = tier === 'high' ? 'stroke-emerald-400' : tier === 'mid' ? 'stroke-amber-400' : 'stroke-white/40';
+  const textColor = tier === 'high' ? 'text-emerald-300' : tier === 'mid' ? 'text-amber-300' : 'text-white/60';
+
+  return (
+    <div className="absolute -bottom-2.5 -right-2.5 flex size-14 items-center justify-center rounded-full bg-background shadow-lg shadow-black/40 ring-4 ring-background">
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={radius} strokeWidth={stroke} className="fill-none stroke-white/10" />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          strokeWidth={stroke}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          className={`fill-none transition-[stroke-dashoffset] duration-700 ease-out ${ringColor}`}
+        />
+      </svg>
+      <span className={`absolute text-[11px] font-bold ${textColor}`}>{percent}%</span>
     </div>
   );
 }
