@@ -13,7 +13,7 @@ interface VerificationRequest {
   UserId: string;
   DocType: string;
   DocReference: string;
-  Status: 'pending' | 'approved' | 'rejected';
+  Status: 'pending' | 'verified' | 'rejected';
   CreatedOn: string;
   Phone: string;
   FirstName: string;
@@ -21,7 +21,7 @@ interface VerificationRequest {
 
 const statusColors: Record<string, string> = {
   pending: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  approved: 'bg-primary/15 text-primary border-primary/30',
+  verified: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
   rejected: 'bg-destructive/15 text-destructive border-destructive/30',
 };
 
@@ -43,7 +43,7 @@ export default function VerificationsPage() {
     return a.Status === 'pending' ? -1 : b.Status === 'pending' ? 1 : 0;
   });
 
-  const handleReview = async (id: string, status: 'approved' | 'rejected') => {
+  const handleReview = async (id: string, status: 'verified' | 'rejected') => {
     setBusyId(id);
     try {
       await api.patch(`/admin/verifications/${id}`, { Status: status });
@@ -95,7 +95,7 @@ export default function VerificationsPage() {
                           variant="outline"
                           className="text-primary hover:text-primary"
                           disabled={busyId === r.VerificationId}
-                          onClick={() => handleReview(r.VerificationId, 'approved')}
+                          onClick={() => handleReview(r.VerificationId, 'verified')}
                         >
                           {busyId === r.VerificationId ? <Loader2 className="animate-spin" /> : <Check />}
                           Approve

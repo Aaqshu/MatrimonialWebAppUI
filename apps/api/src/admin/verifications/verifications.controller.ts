@@ -36,7 +36,7 @@ export class VerificationsController {
 
   @Patch(':id')
   async review(@Param('id') id: string, @Body() body: any, @Query('tenantDbName') tenantDbName?: string) {
-    if (!['approved', 'rejected'].includes(body.Status)) throw new NotFoundException('Invalid status');
+    if (!['verified', 'rejected'].includes(body.Status)) throw new NotFoundException('Invalid status');
     const dbName = tenantDbName || (await this.firstExistingTenantDb());
     if (!dbName) throw new NotFoundException('No tenant DB');
     const pool = this.tenantDb.getDb(dbName);
