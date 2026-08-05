@@ -11,7 +11,7 @@ import {
 const TENANT = 'provision-test_provisiontestmatrimony';
 
 type DocType = 'aadhaar' | 'pan' | 'passport' | 'driving_license' | 'work_email';
-type Status = 'pending' | 'approved' | 'rejected';
+type Status = 'pending' | 'verified' | 'rejected';
 
 interface VerificationRequest {
   VerificationId: string;
@@ -31,7 +31,7 @@ const DOC_TYPES: { value: DocType; label: string; icon: React.ComponentType<{ cl
 
 const STATUS_STYLES: Record<Status, { badge: string; hero: string; icon: React.ComponentType<{ className?: string }>; label: string }> = {
   pending: { badge: 'border-amber-500/30 bg-amber-500/10 text-amber-400', hero: 'from-amber-500/10', icon: ShieldQuestion, label: 'Pending review' },
-  approved: { badge: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400', hero: 'from-emerald-500/10', icon: ShieldCheck, label: 'Verified' },
+  verified: { badge: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400', hero: 'from-emerald-500/10', icon: ShieldCheck, label: 'Verified' },
   rejected: { badge: 'border-red-500/30 bg-red-500/10 text-red-400', hero: 'from-red-500/10', icon: ShieldAlert, label: 'Rejected' },
 };
 
@@ -65,7 +65,7 @@ export default function VerificationPage() {
 
   const latest = requests[0];
   const currentStatus: Status = latest?.Status ?? 'pending';
-  const hasApproved = requests.some(r => r.Status === 'approved');
+  const hasApproved = requests.some(r => r.Status === 'verified');
   const hasPending = requests.some(r => r.Status === 'pending');
 
   async function handleSubmit(e: React.FormEvent) {
@@ -98,7 +98,7 @@ export default function VerificationPage() {
     );
   }
 
-  const heroStyle = STATUS_STYLES[hasApproved ? 'approved' : currentStatus];
+  const heroStyle = STATUS_STYLES[hasApproved ? 'verified' : (currentStatus as Status)] || STATUS_STYLES.pending;
   const HeroIcon = heroStyle.icon;
 
   return (
@@ -120,7 +120,7 @@ export default function VerificationPage() {
             <HeroIcon className="size-7" />
           </div>
           <h1 className="mt-4 text-xl font-semibold tracking-tight">
-            {hasApproved ? "You're verified" : requests.length === 0 ? 'Get verified' : STATUS_STYLES[currentStatus].label}
+            {hasApproved ? "You're verified" : requests.length === 0 ? 'Get verified' : (STATUS_STYLES[currentStatus] || STATUS_STYLES.pending).label}
           </h1>
           <p className="mt-1 text-sm text-white/50">
             {hasApproved
