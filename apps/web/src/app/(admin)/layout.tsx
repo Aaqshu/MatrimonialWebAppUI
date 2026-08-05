@@ -16,6 +16,7 @@ import {
   Users,
   Settings,
   LogOut,
+  ShieldCheck,
 } from 'lucide-react';
 
 const navItems = [
@@ -24,6 +25,7 @@ const navItems = [
   { href: '/subscriptions', label: 'Subscriptions', icon: Repeat },
   { href: '/payments', label: 'Payments', icon: Wallet },
   { href: '/plans', label: 'Plans', icon: CreditCard },
+  { href: '/verifications', label: 'Verifications', icon: ShieldCheck },
   { href: '/templates', label: 'Email Templates', icon: Mail },
   { href: '/admin-users', label: 'Admin Users', icon: Users },
   { href: '/settings', label: 'Settings', icon: Settings },

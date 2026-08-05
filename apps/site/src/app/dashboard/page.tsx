@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { ArrowRight, HeartHandshake, LogOut, ShieldCheck, Sparkles, UserCircle2, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, HeartHandshake, ImagePlus, Lock, LogOut, ShieldCheck, Sparkles, CheckCircle2 } from 'lucide-react';
 
 const TENANT = 'provision-test_provisiontestmatrimony';
 
@@ -79,7 +79,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-500 text-emerald-950">
-                {hasProfile && completion === 100 ? <CheckCircle2 className="size-5" /> : <UserCircle2 className="size-5" />}
+                {hasProfile && completion === 100 ? <CheckCircle2 className="size-5" /> : <HeartHandshake className="size-5" />}
               </div>
               <div>
                 <p className="font-medium">
@@ -114,27 +114,27 @@ export default function DashboardPage() {
         </Link>
 
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-white/8 bg-white/[0.03] p-5">
+          <Link href="/photos" className="rounded-xl border border-white/8 bg-white/[0.03] p-5 transition-all hover:border-white/20">
             <div className="flex items-center gap-2 text-white/50">
-              <UserCircle2 className="size-4" />
-              <p className="text-sm">Profile Status</p>
+              <ImagePlus className="size-4" />
+              <p className="text-sm">Photos</p>
             </div>
-            <p className="mt-2 text-lg font-medium capitalize">{user.Status.replace('_', ' ')}</p>
-          </div>
-          <div className="rounded-xl border border-white/8 bg-white/[0.03] p-5">
-            <div className="flex items-center gap-2 text-white/50">
-              <Sparkles className="size-4" />
-              <p className="text-sm">Contact</p>
-            </div>
-            <p className="mt-2 text-lg font-medium">{user.Phone || user.Email}</p>
-          </div>
-          <div className="rounded-xl border border-white/8 bg-white/[0.03] p-5">
+            <p className="mt-2 text-lg font-medium">Manage photos</p>
+          </Link>
+          <Link href="/verification" className="rounded-xl border border-white/8 bg-white/[0.03] p-5 transition-all hover:border-white/20">
             <div className="flex items-center gap-2 text-white/50">
               <ShieldCheck className="size-4" />
               <p className="text-sm">Verification</p>
             </div>
-            <p className="mt-2 text-lg font-medium text-amber-400">Pending</p>
-          </div>
+            <p className="mt-2 text-lg font-medium text-amber-400">Get verified</p>
+          </Link>
+          <Link href="/privacy" className="rounded-xl border border-white/8 bg-white/[0.03] p-5 transition-all hover:border-white/20">
+            <div className="flex items-center gap-2 text-white/50">
+              <Lock className="size-4" />
+              <p className="text-sm">Privacy</p>
+            </div>
+            <p className="mt-2 text-lg font-medium">Control visibility</p>
+          </Link>
         </div>
 
         <div className="mt-6 rounded-xl border border-dashed border-white/15 bg-white/[0.02] p-8 text-center">
