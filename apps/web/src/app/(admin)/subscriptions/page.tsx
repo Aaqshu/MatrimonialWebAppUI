@@ -8,8 +8,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const statusColors: Record<string, string> = {
+  active: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  past_due: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  cancelled: 'bg-gray-500/15 text-gray-400 border-gray-500/30',
+  paid: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  pending: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  failed: 'bg-red-500/15 text-red-400 border-red-500/30',
+};
+
+const StatusBadge = ({ value }: { value: string }) => (
+  <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs capitalize ${statusColors[value] || 'bg-gray-500/15 text-gray-400 border-gray-500/30'}`}>
+    {value.replace('_', ' ')}
+  </span>
+);
 
 interface Subscription {
   TenantSubscriptionId: string;
@@ -155,8 +169,8 @@ export default function SubscriptionsPage() {
                   <TableCell>{s.PlanName || s.PlanId.slice(0, 8)}</TableCell>
                   <TableCell>₹{s.Amount}</TableCell>
                   <TableCell className="text-gray-400 text-xs">{s.StartDate?.slice(0, 10)} → {s.EndDate?.slice(0, 10) || '∞'}</TableCell>
-                  <TableCell><Badge variant={s.PaymentStatus === 'paid' ? 'default' : 'secondary'}>{s.PaymentStatus}</Badge></TableCell>
-                  <TableCell><Badge variant={s.SubscriptionStatus === 'active' ? 'default' : 'secondary'}>{s.SubscriptionStatus}</Badge></TableCell>
+                  <TableCell><StatusBadge value={s.PaymentStatus} /></TableCell>
+                  <TableCell><StatusBadge value={s.SubscriptionStatus} /></TableCell>
                 </TableRow>
               ))}
               {subs.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-gray-500 py-8">No subscriptions yet</TableCell></TableRow>}
