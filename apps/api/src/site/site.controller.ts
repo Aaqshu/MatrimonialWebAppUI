@@ -113,7 +113,7 @@ export class SiteController {
     await db.query(
       `INSERT INTO "UserSessions" ("SessionId","UserId","RefreshToken","Browser","IPAddress")
        VALUES ($1,$2,$3,$4,$5)`,
-      [uuid(), user.UserId, refreshTokenHash, req.headers['user-agent'] ?? null, req.ip ?? null],
+      [uuid(), user.UserId, refreshTokenHash, String(req.headers['user-agent'] ?? '').slice(0, 100), req.ip ?? null],
     );
 
     const access_token = this.jwt.sign({ sub: user.UserId, tenantDbName, role: 'end_user' });

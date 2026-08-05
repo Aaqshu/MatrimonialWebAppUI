@@ -1,5 +1,7 @@
-import { Controller, Get, Patch, Param, Body } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Body, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 @Controller('admin/feature-flags')
 export class FeatureFlagsController {
@@ -7,12 +9,14 @@ export class FeatureFlagsController {
 
   @Get(':tenantId')
   async get(@Param('tenantId') id: string) {
+    if (!UUID_RE.test(id)) throw new NotFoundException('Tenant not found');
     const { rows } = await this.db.query('SELECT * FROM "FeatureFlags" WHERE "TenantId" = $1', [id]);
     return rows[0] || null;
   }
 
   @Patch(':tenantId')
   async update(@Param('tenantId') id: string, @Body() body: any) {
+    if (!UUID_RE.test(id)) throw new NotFoundException('Tenant not found');
     const sets: string[] = [];
     const vals: any[] = [];
     let i = 1;

@@ -1,6 +1,8 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Pool } from 'pg';
 
+const TENANT_DB_HOST = process.env.TENANT_DATABASE_URL || 'postgresql://postgres:postgres@178.212.35.171:5432';
+
 @Injectable()
 export class TenantDbService implements OnModuleDestroy {
   private pools = new Map<string, Pool>();
@@ -9,7 +11,7 @@ export class TenantDbService implements OnModuleDestroy {
     let pool = this.pools.get(tenantDbName);
     if (!pool) {
       pool = new Pool({
-        connectionString: `postgresql://postgres:postgres@localhost:5432/${tenantDbName}`,
+        connectionString: `${TENANT_DB_HOST}/${tenantDbName}`,
       });
       this.pools.set(tenantDbName, pool);
     }
