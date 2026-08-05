@@ -14,6 +14,7 @@ import { DashboardModule } from './admin/dashboard/dashboard.module';
 import { AdminUsersModule } from './admin/admin-users/admin-users.module';
 import { SubscriptionsModule } from './admin/subscriptions/subscriptions.module';
 import { PaymentsModule } from './admin/payments/payments.module';
+import { SiteModule } from './site/site.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Module({
@@ -32,6 +33,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     AdminUsersModule,
     SubscriptionsModule,
     PaymentsModule,
+    SiteModule,
   ],
   providers: [
     Reflector,

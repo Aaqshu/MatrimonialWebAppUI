@@ -1,0 +1,21 @@
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { SiteController } from './site.controller';
+import { TenantDbService } from './tenant-db.service';
+import { OtpDeliveryService } from './otp-delivery.service';
+
+@Module({
+  imports: [
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        secret: config.get('JWT_SECRET', 'admin-secret-dev'),
+        signOptions: { expiresIn: '24h' },
+      }),
+    }),
+  ],
+  controllers: [SiteController],
+  providers: [TenantDbService, OtpDeliveryService],
+})
+export class SiteModule {}
