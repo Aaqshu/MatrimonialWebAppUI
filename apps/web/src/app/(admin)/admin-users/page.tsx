@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Users, Plus, Trash2 } from 'lucide-react';
 
 interface AdminUser {
   AdminId: string;
@@ -55,30 +56,30 @@ export default function AdminUsersPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Admin Users</h2>
-          <p className="text-sm text-gray-400 mt-1">Platform staff accounts</p>
+          <h2 className="text-2xl font-semibold tracking-tight">Admin Users</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Platform staff accounts</p>
         </div>
-        <Button onClick={() => setOpen(true)}>Add Admin</Button>
+        <Button onClick={() => setOpen(true)}><Plus />Add Admin</Button>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700 text-white">
+        <DialogContent>
           <DialogHeader><DialogTitle>New Admin User</DialogTitle></DialogHeader>
           <form onSubmit={handleCreate} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Username</Label><Input value={form.AdminUserName} onChange={e => setForm({...form, AdminUserName: e.target.value})} className="bg-gray-800 border-gray-700" required /></div>
-              <div><Label>Password</Label><Input type="password" value={form.Password} onChange={e => setForm({...form, Password: e.target.value})} className="bg-gray-800 border-gray-700" required /></div>
-              <div><Label>First Name</Label><Input value={form.FirstName} onChange={e => setForm({...form, FirstName: e.target.value})} className="bg-gray-800 border-gray-700" /></div>
-              <div><Label>Last Name</Label><Input value={form.LastName} onChange={e => setForm({...form, LastName: e.target.value})} className="bg-gray-800 border-gray-700" /></div>
-              <div><Label>Email</Label><Input type="email" value={form.Email} onChange={e => setForm({...form, Email: e.target.value})} className="bg-gray-800 border-gray-700" required /></div>
-              <div><Label>Phone</Label><Input value={form.Phone} onChange={e => setForm({...form, Phone: e.target.value})} className="bg-gray-800 border-gray-700" /></div>
+              <div><Label>Username</Label><Input value={form.AdminUserName} onChange={e => setForm({...form, AdminUserName: e.target.value})} required /></div>
+              <div><Label>Password</Label><Input type="password" value={form.Password} onChange={e => setForm({...form, Password: e.target.value})} required /></div>
+              <div><Label>First Name</Label><Input value={form.FirstName} onChange={e => setForm({...form, FirstName: e.target.value})} /></div>
+              <div><Label>Last Name</Label><Input value={form.LastName} onChange={e => setForm({...form, LastName: e.target.value})} /></div>
+              <div><Label>Email</Label><Input type="email" value={form.Email} onChange={e => setForm({...form, Email: e.target.value})} required /></div>
+              <div><Label>Phone</Label><Input value={form.Phone} onChange={e => setForm({...form, Phone: e.target.value})} /></div>
               <div className="col-span-2">
                 <Label>Role</Label>
                 <Select value={form.Role} onValueChange={v => setForm({...form, Role: v ?? 'support'})}>
-                  <SelectTrigger className="bg-gray-800 border-gray-700"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>
                     <SelectItem value="super_admin">Super Admin</SelectItem>
                     <SelectItem value="support">Support</SelectItem>
                   </SelectContent>
@@ -90,33 +91,42 @@ export default function AdminUsersPage() {
         </DialogContent>
       </Dialog>
 
-      <Card className="bg-gray-900 border-gray-800">
+      <Card>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="border-gray-800">
-                <TableHead className="text-gray-400">Username</TableHead>
-                <TableHead className="text-gray-400">Name</TableHead>
-                <TableHead className="text-gray-400">Email</TableHead>
-                <TableHead className="text-gray-400">Role</TableHead>
-                <TableHead className="text-gray-400">Active</TableHead>
-                <TableHead className="text-gray-400 text-right">Actions</TableHead>
+              <TableRow>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Username</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Name</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Email</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Role</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Active</TableHead>
+                <TableHead className="text-right text-xs uppercase tracking-wide text-muted-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {users.map((u) => (
-                <TableRow key={u.AdminId} className="border-gray-800">
+                <TableRow key={u.AdminId}>
                   <TableCell className="font-medium">{u.AdminUserName}</TableCell>
                   <TableCell>{[u.FirstName, u.LastName].filter(Boolean).join(' ') || '—'}</TableCell>
-                  <TableCell className="text-gray-400">{u.Email}</TableCell>
+                  <TableCell className="text-muted-foreground">{u.Email}</TableCell>
                   <TableCell><Badge variant={u.Role === 'super_admin' ? 'default' : 'secondary'}>{u.Role}</Badge></TableCell>
                   <TableCell><Switch checked={u.IsActive} onCheckedChange={() => handleToggle(u)} aria-label="toggle" /></TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => handleDelete(u.AdminId)}>Delete</Button>
+                    <Button variant="ghost" size="icon-sm" className="text-destructive hover:text-destructive" onClick={() => handleDelete(u.AdminId)} aria-label="Delete admin user"><Trash2 /></Button>
                   </TableCell>
                 </TableRow>
               ))}
-              {users.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-gray-500 py-8">No admin users</TableCell></TableRow>}
+              {users.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="py-14 text-center">
+                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                      <Users className="size-8 opacity-40" />
+                      <p className="text-sm">No admin users</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

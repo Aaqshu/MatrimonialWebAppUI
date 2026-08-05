@@ -8,9 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CreditCard, Plus, Pencil, Trash2 } from 'lucide-react';
 
 interface Plan {
   id: string;
@@ -73,27 +73,27 @@ export default function PlansPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Subscription Plans</h2>
-          <p className="text-sm text-gray-400 mt-1">Tiers billed to tenants (Razorpay payment integration ready)</p>
+          <h2 className="text-2xl font-semibold tracking-tight">Subscription Plans</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Tiers billed to tenants (Razorpay payment integration ready)</p>
         </div>
-        <Button onClick={openCreate}>Add Plan</Button>
+        <Button onClick={openCreate}><Plus />Add Plan</Button>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-lg">
+        <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle>{editing ? 'Edit Plan' : 'New Plan'}</DialogTitle></DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Name</Label><Input value={form.planName} onChange={e => setForm({...form, planName: e.target.value})} className="bg-gray-800 border-gray-700" required /></div>
-              <div><Label>Price (₹)</Label><Input type="number" step="0.01" min="0" value={form.price} onChange={e => setForm({...form, price: e.target.value})} className="bg-gray-800 border-gray-700" required /></div>
-              <div className="col-span-2"><Label>Description</Label><Input value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="bg-gray-800 border-gray-700" /></div>
+              <div><Label>Name</Label><Input value={form.planName} onChange={e => setForm({...form, planName: e.target.value})} required /></div>
+              <div><Label>Price (₹)</Label><Input type="number" step="0.01" min="0" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required /></div>
+              <div className="col-span-2"><Label>Description</Label><Input value={form.description} onChange={e => setForm({...form, description: e.target.value})} /></div>
               <div>
                 <Label>Billing Cycle</Label>
                 <Select value={form.billingCycle} onValueChange={v => setForm({...form, billingCycle: v ?? 'monthly'})}>
-                  <SelectTrigger className="bg-gray-800 border-gray-700"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>
                     <SelectItem value="monthly">Monthly</SelectItem>
                     <SelectItem value="yearly">Yearly</SelectItem>
                   </SelectContent>
@@ -105,36 +105,45 @@ export default function PlansPage() {
         </DialogContent>
       </Dialog>
 
-      <Card className="bg-gray-900 border-gray-800">
+      <Card>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="border-gray-800">
-                <TableHead className="text-gray-400">Name</TableHead>
-                <TableHead className="text-gray-400">Price</TableHead>
-                <TableHead className="text-gray-400">Billing</TableHead>
-                <TableHead className="text-gray-400">Description</TableHead>
-                <TableHead className="text-gray-400">Active</TableHead>
-                <TableHead className="text-gray-400 text-right">Actions</TableHead>
+              <TableRow>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Name</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Price</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Billing</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Description</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Active</TableHead>
+                <TableHead className="text-right text-xs uppercase tracking-wide text-muted-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {plans.map((p) => (
-                <TableRow key={p.id} className="border-gray-800">
+                <TableRow key={p.id}>
                   <TableCell className="font-medium">{p.planName}</TableCell>
-                  <TableCell>₹{p.price}</TableCell>
+                  <TableCell className="tabular-nums">₹{p.price}</TableCell>
                   <TableCell className="capitalize">{p.billingCycle}</TableCell>
-                  <TableCell className="text-gray-400 max-w-xs truncate">{p.description || '—'}</TableCell>
+                  <TableCell className="max-w-xs truncate text-muted-foreground">{p.description || '—'}</TableCell>
                   <TableCell>
                     <Switch checked={p.isActive} onCheckedChange={() => handleToggle(p)} aria-label="toggle" />
                   </TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button variant="ghost" size="sm" onClick={() => openEdit(p)}>Edit</Button>
-                    <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => handleDelete(p.id)}>Delete</Button>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="icon-sm" onClick={() => openEdit(p)} aria-label="Edit plan"><Pencil /></Button>
+                    <Button variant="ghost" size="icon-sm" className="text-destructive hover:text-destructive" onClick={() => handleDelete(p.id)} aria-label="Delete plan"><Trash2 /></Button>
                   </TableCell>
                 </TableRow>
               ))}
-              {plans.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-gray-500 py-8">No plans yet</TableCell></TableRow>}
+              {plans.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="py-14 text-center">
+                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                      <CreditCard className="size-8 opacity-40" />
+                      <p className="text-sm">No plans yet</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

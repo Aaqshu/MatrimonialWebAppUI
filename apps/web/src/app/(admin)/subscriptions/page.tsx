@@ -9,18 +9,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Repeat, Plus } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
-  active: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  active: 'bg-primary/15 text-primary border-primary/30',
   past_due: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  cancelled: 'bg-gray-500/15 text-gray-400 border-gray-500/30',
-  paid: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  cancelled: 'bg-muted text-muted-foreground border-border',
+  paid: 'bg-primary/15 text-primary border-primary/30',
   pending: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  failed: 'bg-red-500/15 text-red-400 border-red-500/30',
+  failed: 'bg-destructive/15 text-destructive border-destructive/30',
 };
 
 const StatusBadge = ({ value }: { value: string }) => (
-  <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs capitalize ${statusColors[value] || 'bg-gray-500/15 text-gray-400 border-gray-500/30'}`}>
+  <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs capitalize ${statusColors[value] || 'bg-muted text-muted-foreground border-border'}`}>
     {value.replace('_', ' ')}
   </span>
 );
@@ -101,27 +102,27 @@ export default function SubscriptionsPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Tenant Subscriptions</h2>
-          <p className="text-sm text-gray-400 mt-1">Plans billed to tenants</p>
+          <h2 className="text-2xl font-semibold tracking-tight">Tenant Subscriptions</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Plans billed to tenants</p>
         </div>
-        <Button onClick={openCreate}>Add Subscription</Button>
+        <Button onClick={openCreate}><Plus />Add Subscription</Button>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700 text-white">
+        <DialogContent>
           <DialogHeader><DialogTitle>New Subscription</DialogTitle></DialogHeader>
           <form onSubmit={handleCreate} className="space-y-3">
             <div>
               <Label>Tenant</Label>
               <Select value={form.TenantId} onValueChange={v => setForm({...form, TenantId: v ?? ''})}>
-                <SelectTrigger className="bg-gray-800 border-gray-700">
+                <SelectTrigger className="w-full">
                   <SelectValue>
                     {(v: string | null) => v ? (tenants.find(t => t.TenantId === v)?.CompanyName ?? v) : 'Select tenant'}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-700">
+                <SelectContent>
                   {tenants.map(t => <SelectItem key={t.TenantId} value={t.TenantId}>{t.CompanyName}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -129,51 +130,60 @@ export default function SubscriptionsPage() {
             <div>
               <Label>Plan</Label>
               <Select value={form.PlanId} onValueChange={handlePlanChange}>
-                <SelectTrigger className="bg-gray-800 border-gray-700">
+                <SelectTrigger className="w-full">
                   <SelectValue>
                     {(v: string | null) => v ? (plans.find(p => p.PlanId === v)?.PlanName ?? v) : 'Select plan'}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-700">
+                <SelectContent>
                   {plans.map(p => <SelectItem key={p.PlanId} value={p.PlanId}>{p.PlanName} — ₹{p.Price}/{p.BillingCycle}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Start Date</Label><Input type="date" value={form.StartDate} onChange={e => setForm({...form, StartDate: e.target.value})} className="bg-gray-800 border-gray-700" required /></div>
-              <div><Label>End Date</Label><Input type="date" value={form.EndDate} onChange={e => setForm({...form, EndDate: e.target.value})} className="bg-gray-800 border-gray-700" required /></div>
+              <div><Label>Start Date</Label><Input type="date" value={form.StartDate} onChange={e => setForm({...form, StartDate: e.target.value})} required /></div>
+              <div><Label>End Date</Label><Input type="date" value={form.EndDate} onChange={e => setForm({...form, EndDate: e.target.value})} required /></div>
             </div>
-            <p className="text-xs text-gray-500">Dates auto-fill from plan billing cycle — adjust if needed.</p>
+            <p className="text-xs text-muted-foreground">Dates auto-fill from plan billing cycle — adjust if needed.</p>
             <Button type="submit" className="w-full">Create</Button>
           </form>
         </DialogContent>
       </Dialog>
 
-      <Card className="bg-gray-900 border-gray-800">
+      <Card>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="border-gray-800">
-                <TableHead className="text-gray-400">Tenant</TableHead>
-                <TableHead className="text-gray-400">Plan</TableHead>
-                <TableHead className="text-gray-400">Amount</TableHead>
-                <TableHead className="text-gray-400">Period</TableHead>
-                <TableHead className="text-gray-400">Payment</TableHead>
-                <TableHead className="text-gray-400">Status</TableHead>
+              <TableRow>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Tenant</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Plan</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Amount</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Period</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Payment</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {subs.map((s) => (
-                <TableRow key={s.TenantSubscriptionId} className="border-gray-800">
-                  <TableCell>{s.CompanyName || s.TenantId.slice(0, 8)}</TableCell>
+                <TableRow key={s.TenantSubscriptionId}>
+                  <TableCell className="font-medium">{s.CompanyName || s.TenantId.slice(0, 8)}</TableCell>
                   <TableCell>{s.PlanName || s.PlanId.slice(0, 8)}</TableCell>
-                  <TableCell>₹{s.Amount}</TableCell>
-                  <TableCell className="text-gray-400 text-xs">{s.StartDate?.slice(0, 10)} → {s.EndDate?.slice(0, 10) || '∞'}</TableCell>
+                  <TableCell className="tabular-nums">₹{s.Amount}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{s.StartDate?.slice(0, 10)} → {s.EndDate?.slice(0, 10) || '∞'}</TableCell>
                   <TableCell><StatusBadge value={s.PaymentStatus} /></TableCell>
                   <TableCell><StatusBadge value={s.SubscriptionStatus} /></TableCell>
                 </TableRow>
               ))}
-              {subs.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-gray-500 py-8">No subscriptions yet</TableCell></TableRow>}
+              {subs.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="py-14 text-center">
+                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                      <Repeat className="size-8 opacity-40" />
+                      <p className="text-sm">No subscriptions yet</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

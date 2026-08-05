@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { Mail, Plus, Pencil, Trash2 } from 'lucide-react';
 
 interface Template {
   id: string;
@@ -72,38 +72,38 @@ export default function TemplatesPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Email Templates</h2>
-          <p className="text-sm text-gray-400 mt-1">Transactional emails for auth, matches &amp; notifications</p>
+          <h2 className="text-2xl font-semibold tracking-tight">Email Templates</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Transactional emails for auth, matches &amp; notifications</p>
         </div>
-        <Button onClick={openCreate}>Add Template</Button>
+        <Button onClick={openCreate}><Plus />Add Template</Button>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-2xl">
+        <DialogContent className="max-w-2xl">
           <DialogHeader><DialogTitle>{editing ? 'Edit Template' : 'New Template'}</DialogTitle></DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Name</Label><Input value={form.templateName} onChange={e => setForm({...form, templateName: e.target.value})} className="bg-gray-800 border-gray-700" required /></div>
-              <div><Label>Subject</Label><Input value={form.subject} onChange={e => setForm({...form, subject: e.target.value})} className="bg-gray-800 border-gray-700" required /></div>
+              <div><Label>Name</Label><Input value={form.templateName} onChange={e => setForm({...form, templateName: e.target.value})} required /></div>
+              <div><Label>Subject</Label><Input value={form.subject} onChange={e => setForm({...form, subject: e.target.value})} required /></div>
             </div>
             <div>
-              <Label>Body <span className="text-gray-500 text-xs">(HTML supported)</span></Label>
-              <textarea rows={6} value={form.body} onChange={e => setForm({...form, body: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono" required />
+              <Label>Body <span className="text-xs text-muted-foreground">(HTML supported)</span></Label>
+              <textarea rows={6} value={form.body} onChange={e => setForm({...form, body: e.target.value})} className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30 font-mono" required />
             </div>
             <div className="flex flex-wrap gap-1.5">
               {variables.map(v => (
                 <button key={v} type="button" onClick={() => setForm({...form, body: form.body + v})}
-                  className="text-xs px-2 py-1 rounded bg-gray-800 border border-gray-700 text-gray-300 hover:border-emerald-500 hover:text-emerald-400">
+                  className="cursor-pointer rounded-md border border-input bg-transparent px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary">
                   {v}
                 </button>
               ))}
             </div>
             {preview && (
-              <div className="border border-gray-700 rounded p-3 bg-gray-950">
-                <Label className="text-xs text-gray-500">Preview</Label>
-                <div className="text-sm mt-1 whitespace-pre-wrap">{preview}</div>
+              <div className="rounded-lg border border-input p-3">
+                <Label className="text-xs text-muted-foreground">Preview</Label>
+                <div className="mt-1 text-sm whitespace-pre-wrap">{preview}</div>
               </div>
             )}
             <Button type="submit" className="w-full">{editing ? 'Save Changes' : 'Create Template'}</Button>
@@ -111,32 +111,41 @@ export default function TemplatesPage() {
         </DialogContent>
       </Dialog>
 
-      <Card className="bg-gray-900 border-gray-800">
+      <Card>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="border-gray-800">
-                <TableHead className="text-gray-400">Name</TableHead>
-                <TableHead className="text-gray-400">Subject</TableHead>
-                <TableHead className="text-gray-400">Active</TableHead>
-                <TableHead className="text-gray-400 text-right">Actions</TableHead>
+              <TableRow>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Name</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Subject</TableHead>
+                <TableHead className="text-xs uppercase tracking-wide text-muted-foreground">Active</TableHead>
+                <TableHead className="text-right text-xs uppercase tracking-wide text-muted-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {templates.map((t) => (
-                <TableRow key={t.id} className="border-gray-800">
+                <TableRow key={t.id}>
                   <TableCell className="font-medium">{t.templateName}</TableCell>
-                  <TableCell className="text-gray-400">{t.subject}</TableCell>
+                  <TableCell className="text-muted-foreground">{t.subject}</TableCell>
                   <TableCell>
                     <Switch checked={t.isActive} onCheckedChange={() => handleToggle(t)} aria-label="toggle" />
                   </TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button variant="ghost" size="sm" onClick={() => { setPreview(t.body); openEdit(t); }}>Edit</Button>
-                    <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => handleDelete(t.id)}>Delete</Button>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="icon-sm" onClick={() => { setPreview(t.body); openEdit(t); }} aria-label="Edit template"><Pencil /></Button>
+                    <Button variant="ghost" size="icon-sm" className="text-destructive hover:text-destructive" onClick={() => handleDelete(t.id)} aria-label="Delete template"><Trash2 /></Button>
                   </TableCell>
                 </TableRow>
               ))}
-              {templates.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-gray-500 py-8">No templates yet</TableCell></TableRow>}
+              {templates.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={4} className="py-14 text-center">
+                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                      <Mail className="size-8 opacity-40" />
+                      <p className="text-sm">No templates yet</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
