@@ -5,6 +5,7 @@ import { Client } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const REPO_ROOT = path.resolve(__dirname, '../../../../..');
 const MAINTENANCE_DB_URL = 'postgresql://postgres:postgres@localhost:5432/postgres';
 
@@ -14,12 +15,14 @@ export class ProvisioningController {
 
   @Get(':tenantId')
   async getByTenant(@Param('tenantId') id: string) {
+    if (!UUID_RE.test(id)) throw new NotFoundException('Tenant not found');
     const { rows } = await this.db.query('SELECT * FROM "TenantProvisioningLog" WHERE "TenantId" = $1 ORDER BY "CreatedOn" DESC', [id]);
     return rows;
   }
 
   @Post(':tenantId/run')
   async run(@Param('tenantId') tenantId: string) {
+    if (!UUID_RE.test(tenantId)) throw new NotFoundException('Tenant not found');
     const { rows } = await this.db.query('SELECT * FROM "Tenants" WHERE "TenantId" = $1', [tenantId]);
     const tenant = rows[0];
     if (!tenant) throw new NotFoundException('Tenant not found');
