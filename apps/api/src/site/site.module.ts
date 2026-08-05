@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SiteController } from './site.controller';
+import { SiteProfileController } from './profile.controller';
 import { TenantDbService } from './tenant-db.service';
 import { OtpDeliveryService } from './otp-delivery.service';
 
@@ -15,7 +16,7 @@ import { OtpDeliveryService } from './otp-delivery.service';
       }),
     }),
   ],
-  controllers: [SiteController],
+  controllers: [SiteController, SiteProfileController],
   providers: [TenantDbService, OtpDeliveryService],
 })
 export class SiteModule {}
