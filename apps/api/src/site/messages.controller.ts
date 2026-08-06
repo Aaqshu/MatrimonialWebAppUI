@@ -64,12 +64,12 @@ export class SiteMessagesController {
       [uuid(), sub, toUserId, String(message).trim()],
     );
 
-    // notification for receiver
+    // notification for receiver (with RefUserId so the toast can deep-link to the chat)
     const senderName = (await db.query(`SELECT "FirstName" FROM "Users" WHERE "UserId" = $1`, [sub])).rows[0]?.FirstName || 'Someone';
     await db.query(
-      `INSERT INTO "Notifications" ("NotificationId","UserId","Title","Message")
-       VALUES ($1,$2,$3,$4)`,
-      [uuid(), toUserId, 'New message', `${senderName} sent you a message`],
+      `INSERT INTO "Notifications" ("NotificationId","UserId","Title","Message","RefUserId")
+       VALUES ($1,$2,$3,$4,$5)`,
+      [uuid(), toUserId, 'New message', `${senderName} sent you a message`, sub],
     );
 
     return { message: rows[0] };

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { ArrowRight, Bell, HeartHandshake, ImagePlus, Loader2, Lock, LogOut, MessageCircle, SearchIcon, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, HeartHandshake, ImagePlus, Loader2, Lock, LogOut, MessageCircle, SearchIcon, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 const TENANT = 'provision-test_provisiontestmatrimony';
 
@@ -21,7 +21,6 @@ export default function DashboardPage() {
   const [completion, setCompletion] = useState<number | null>(null);
   const [hasProfile, setHasProfile] = useState(false);
   const [pendingInterests, setPendingInterests] = useState(0);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
 
   useEffect(() => {
@@ -41,19 +40,13 @@ export default function DashboardPage() {
         if (m?.data?.received) {
           setPendingInterests(m.data.received.filter((r: any) => r.Status === 'pending').length);
         }
+        return api.get(`/site/messages/${TENANT}/threads`).catch(() => null);
       })
-      .catch(() => { window.location.href = '/'; });
-
-    api.get(`/site/notifications/${TENANT}`)
-      .then(({ data }) => setUnreadNotifications(data.unreadCount ?? 0))
-      .catch(() => {});
-
-    api.get(`/site/messages/${TENANT}/threads`)
-      .then(({ data }) => {
-        const sum = (data.threads ?? []).reduce((s: number, t: any) => s + (t.UnreadCount || 0), 0);
+      .then((th: any) => {
+        const sum = (th?.data?.threads ?? []).reduce((s: number, t: any) => s + (t.UnreadCount || 0), 0);
         setUnreadMessages(sum);
       })
-      .catch(() => {});
+      .catch(() => { window.location.href = '/'; });
   }, []);
 
   const logout = () => {
@@ -208,26 +201,6 @@ export default function DashboardPage() {
               {unreadMessages > 0 && (
                 <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-emerald-950">
                   {unreadMessages}
-                </span>
-              )}
-            </div>
-          </Link>
-          <Link href="/notifications" className="block rounded-2xl border border-white/8 bg-white/[0.03] p-6 transition-all duration-200 hover:border-amber-500/30 hover:bg-white/[0.05]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3.5">
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/5 text-white/60">
-                  <Bell className="size-5" />
-                </div>
-                <div>
-                  <p className="font-medium">Notifications</p>
-                  <p className="mt-0.5 text-sm text-white/50">
-                    {unreadNotifications > 0 ? `${unreadNotifications} unread` : 'You\'re all caught up'}
-                  </p>
-                </div>
-              </div>
-              {unreadNotifications > 0 && (
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-amber-950">
-                  {unreadNotifications}
                 </span>
               )}
             </div>

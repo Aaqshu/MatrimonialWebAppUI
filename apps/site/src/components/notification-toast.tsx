@@ -15,6 +15,7 @@ interface Notif {
   Message: string | null;
   IsRead: boolean;
   CreatedOn: string;
+  RefUserId?: string | null;
 }
 
 const TITLE_ICON: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -58,12 +59,19 @@ export default function NotificationToast() {
 
   if (!toast) return null;
   const Icon = TITLE_ICON[toast.Title] || Bell;
+  // click → chat window for messages, profile for interest
+  const href = toast.Title === 'New message' && toast.RefUserId
+    ? `/chat?userId=${toast.RefUserId}`
+    : toast.Title === 'Interest' && toast.RefUserId
+      ? `/profile/${toast.RefUserId}`
+      : '/notifications';
 
   return (
     <div className="fixed right-4 top-4 z-50 sm:right-6 sm:top-6">
-      <div
-        key={toast.NotificationId}
-        className="animate-slide-in-right w-80 overflow-hidden rounded-2xl border border-emerald-500/25 bg-zinc-900/95 shadow-2xl shadow-black/50 backdrop-blur-md"
+      <Link
+        href={href}
+        onClick={() => setToast(null)}
+        className={`animate-slide-in-right block w-80 overflow-hidden rounded-2xl border border-emerald-500/25 bg-zinc-900/95 shadow-2xl shadow-black/50 backdrop-blur-md transition-colors hover:border-emerald-500/50 ${toast.Title === 'New message' ? 'cursor-pointer' : ''}`}
       >
         <div className="flex items-start gap-3 p-4">
           <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
@@ -72,23 +80,21 @@ export default function NotificationToast() {
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-white">{toast.Title}</p>
             <p className="mt-0.5 line-clamp-2 text-xs text-white/60">{toast.Message}</p>
-            <Link
-              href="/notifications"
-              className="mt-2 inline-block text-xs font-medium text-emerald-400 hover:text-emerald-300"
-              onClick={() => setToast(null)}
-            >
-              View notifications →
-            </Link>
+            {toast.Title === 'New message' && (
+              <span className="mt-2 inline-block text-xs font-medium text-emerald-400">
+                Open chat →
+              </span>
+            )}
           </div>
           <button
-            onClick={() => setToast(null)}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setToast(null); }}
             className="shrink-0 cursor-pointer rounded-lg p-1 text-white/40 transition-colors hover:bg-white/10 hover:text-white"
             aria-label="Dismiss"
           >
             <X className="size-4" />
           </button>
         </div>
-      </div>
+      </Link>
     </div>
   );
 }
