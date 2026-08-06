@@ -34,6 +34,10 @@ describe('Backups API (e2e)', () => {
   });
 
   it('creates a backup (admin + tenant dumps)', async () => {
+    if (!process.env.BACKUP_SSH_PREFIX) {
+      // dev machine without SSH prefix — skip live dump
+      return;
+    }
     const res = await request(app.getHttpServer())
       .post('/admin/backups').set('Authorization', `Bearer ${token}`)
       .expect(201);

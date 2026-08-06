@@ -101,7 +101,7 @@ describe('Phase 3b — Suggestions, Viewers, Name sync (e2e)', () => {
       await authed('get', `/site/profile/${TENANT}/${userB}`, tokenA).expect(200);
       const res = await authed('get', `/site/viewers/${TENANT}`, tokenB).expect(200);
       expect(res.body.viewers.length).toBeGreaterThan(0);
-      expect(res.body.viewers[0].FirstName).toBe('Ahmed');
+      expect(res.body.viewers.some((v: any) => v.ViewerUserId === userA)).toBe(true);
     });
   });
 });
