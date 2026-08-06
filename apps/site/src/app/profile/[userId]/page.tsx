@@ -5,9 +5,16 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
 import {
-  ArrowLeft, BadgeCheck, Briefcase, Cake, Heart, HeartHandshake, GraduationCap,
-  Home, Languages, Loader2, MapPin, ShieldAlert, Sparkles, UserCircle2, Users,
+  ArrowLeft, BadgeCheck, Briefcase, Cake, Flag, Heart, HeartHandshake, GraduationCap,
+  Home, Languages, Loader2, MapPin, ShieldAlert, Sparkles, UserCircle2, Users, X,
 } from 'lucide-react';
+
+const REPORT_REASONS = [
+  { value: 'fake_profile', label: 'Fake profile' },
+  { value: 'harassment', label: 'Harassment' },
+  { value: 'inappropriate_content', label: 'Inappropriate content' },
+  { value: 'other', label: 'Other' },
+];
 
 const TENANT = 'provision-test_provisiontestmatrimony';
 
@@ -54,6 +61,10 @@ export default function PublicProfilePage() {
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState('');
   const [toast, setToast] = useState('');
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reportDesc, setReportDesc] = useState('');
+  const [reportBusy, setReportBusy] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -84,6 +95,26 @@ export default function PublicProfilePage() {
       showToast(e.response?.data?.message || 'Action failed');
     } finally {
       setBusy('');
+    }
+  };
+
+  const submitReport = async () => {
+    if (!reportReason || !prof) return;
+    setReportBusy(true);
+    try {
+      await api.post(`/site/reports/${TENANT}`, {
+        reportedUserId: prof.UserId,
+        reason: reportReason,
+        description: reportDesc || undefined,
+      });
+      setReportOpen(false);
+      setReportReason('');
+      setReportDesc('');
+      showToast('Report submitted — our team will review');
+    } catch (e: any) {
+      showToast(e.response?.data?.message || 'Failed to submit report');
+    } finally {
+      setReportBusy(false);
     }
   };
 
@@ -181,6 +212,13 @@ export default function PublicProfilePage() {
                     <ShieldAlert className="size-4" /> Block
                   </button>
                 )}
+                <button
+                  onClick={() => setReportOpen(true)}
+                  disabled={!!busy}
+                  className="flex cursor-pointer items-center gap-1.5 rounded-full border border-transparent px-5 py-2 text-sm font-medium text-red-400/70 transition-colors hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300 disabled:cursor-wait disabled:opacity-50"
+                >
+                  <Flag className="size-4" /> Report
+                </button>
               </div>
             </div>
           </div>
@@ -221,6 +259,76 @@ export default function PublicProfilePage() {
           </Section>
         </div>
       </div>
+
+      {/* Report modal */}
+      {reportOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-zinc-900 p-6 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <p className="flex items-center gap-1.5 font-semibold">
+                <Flag className="size-4 text-red-400" /> Report {prof.FirstName}
+              </p>
+              <button
+                type="button"
+                onClick={() => setReportOpen(false)}
+                disabled={reportBusy}
+                className="cursor-pointer rounded-lg p-1 text-white/40 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
+                aria-label="Close"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <p className="mt-3 text-xs font-medium uppercase tracking-wide text-white/40">Reason</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {REPORT_REASONS.map(r => (
+                <button
+                  key={r.value}
+                  type="button"
+                  onClick={() => setReportReason(r.value)}
+                  disabled={reportBusy}
+                  className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${
+                    reportReason === r.value
+                      ? 'border-red-500/50 bg-red-500/15 text-red-300'
+                      : 'border-white/10 text-white/50 hover:border-white/20 hover:text-white/80'
+                  }`}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+
+            <p className="mt-4 text-xs font-medium uppercase tracking-wide text-white/40">Details (optional)</p>
+            <textarea
+              value={reportDesc}
+              onChange={e => setReportDesc(e.target.value)}
+              disabled={reportBusy}
+              rows={3}
+              placeholder="Tell us more…"
+              className="mt-2 w-full resize-none rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-red-500/50 focus:ring-3 focus:ring-red-500/15 disabled:opacity-50"
+            />
+
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setReportOpen(false)}
+                disabled={reportBusy}
+                className="flex-1 cursor-pointer rounded-lg border border-white/10 py-2.5 text-sm font-medium text-white/70 transition-colors hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={submitReport}
+                disabled={reportBusy || !reportReason}
+                className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-red-500 py-2.5 text-sm font-medium text-red-950 transition-colors duration-150 hover:bg-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {reportBusy ? <Loader2 className="size-4 animate-spin" /> : 'Submit report'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast */}
       <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 transition-all duration-300 ${toast ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'}`}>

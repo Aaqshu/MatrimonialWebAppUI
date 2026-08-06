@@ -17,6 +17,7 @@ import {
   Settings,
   LogOut,
   ShieldCheck,
+  ShieldAlert,
   DatabaseBackup,
 } from 'lucide-react';
 
@@ -27,6 +28,7 @@ const navItems = [
   { href: '/payments', label: 'Payments', icon: Wallet },
   { href: '/plans', label: 'Plans', icon: CreditCard },
   { href: '/verifications', label: 'Verifications', icon: ShieldCheck },
+  { href: '/moderation', label: 'Moderation', icon: ShieldAlert },
   { href: '/templates', label: 'Email Templates', icon: Mail },
   { href: '/admin-users', label: 'Admin Users', icon: Users },
   { href: '/backups', label: 'Backups', icon: DatabaseBackup },

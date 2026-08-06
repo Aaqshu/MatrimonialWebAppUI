@@ -197,6 +197,9 @@ export default function DashboardPage() {
             </div>
           </Link>
         </div>
+        <Link href="/stories" className="mt-2 inline-block text-xs text-white/40 transition-colors hover:text-emerald-400">
+          Read success stories →
+        </Link>
 
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Link href="/chat" className="block rounded-2xl border border-white/8 bg-white/[0.03] p-6 transition-all duration-200 hover:border-emerald-500/30 hover:bg-white/[0.05]">
