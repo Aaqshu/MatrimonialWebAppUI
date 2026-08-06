@@ -67,6 +67,14 @@ export class SiteProfileController {
       [uuid(), sub, p.Gender, p.DateOfBirth, p.Height ?? null, p.Weight ?? null, p.MaritalStatus ?? 'never_married', p.Religion ?? null, p.Caste ?? null, p.SubCaste ?? null, p.Sect ?? null, p.MotherTongue ?? null, p.BloodGroup ?? null, p.AboutMe ?? null],
     );
 
+    // sync name onto Users (create path) so dashboards never show the "User" placeholder
+    if (p.FirstName || p.LastName) {
+      await db.query(
+        `UPDATE "Users" SET "FirstName" = $1, "LastName" = $2 WHERE "UserId" = $3`,
+        [p.FirstName ?? null, p.LastName ?? null, sub],
+      );
+    }
+
     for (const [key, part] of Object.entries(PROFILE_PARTS)) {
       const data = body[key];
       if (!data || typeof data !== 'object') continue;
@@ -103,6 +111,14 @@ export class SiteProfileController {
       if (sets.length) {
         vals.push(sub);
         await db.query(`UPDATE "UserProfiles" SET ${sets.join(',')} WHERE "UserId" = $${i}`, vals);
+      }
+      // sync FirstName/LastName onto Users so dashboards don't show the "User" placeholder
+      const fullName = [body.profile.FirstName, body.profile.LastName].filter(Boolean);
+      if (fullName.length) {
+        await db.query(
+          `UPDATE "Users" SET "FirstName" = $1, "LastName" = $2 WHERE "UserId" = $3`,
+          [body.profile.FirstName ?? null, body.profile.LastName ?? null, sub],
+        );
       }
     }
 

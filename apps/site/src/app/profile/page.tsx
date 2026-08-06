@@ -13,6 +13,7 @@ const TENANT_DB = 'provision-test_provisiontestmatrimony';
 /* ---------------------------------- types --------------------------------- */
 
 interface ProfileSection {
+  FirstName: string; LastName: string;
   Gender: string; DateOfBirth: string; Height: string; Weight: string;
   MaritalStatus: string; BloodGroup: string; AboutMe: string;
   Religion: string; Caste: string; SubCaste: string; Sect: string; MotherTongue: string;
@@ -50,7 +51,7 @@ interface WizardState {
 }
 
 const emptyState: WizardState = {
-  profile: { Gender: '', DateOfBirth: '', Height: '', Weight: '', MaritalStatus: '', BloodGroup: '', AboutMe: '', Religion: '', Caste: '', SubCaste: '', Sect: '', MotherTongue: '' },
+  profile: { FirstName: '', LastName: '', Gender: '', DateOfBirth: '', Height: '', Weight: '', MaritalStatus: '', BloodGroup: '', AboutMe: '', Religion: '', Caste: '', SubCaste: '', Sect: '', MotherTongue: '' },
   education: { Qualification: '', College: '', University: '', PassingYear: '', EducationType: '' },
   occupation: { Occupation: '', CompanyName: '', Designation: '', AnnualIncome: '', WorkLocation: '' },
   family: { FamilyType: '', FamilyStatus: '', FatherName: '', FatherOccupation: '', MotherName: '', MotherOccupation: '', Brothers: '', Sisters: '' },
@@ -72,7 +73,7 @@ const STEPS = [
 
 /** Fields counted toward overall completion (booleans excluded — always have a value). */
 const COMPLETION_FIELDS: Array<[keyof WizardState, string]> = [
-  ['profile', 'Gender'], ['profile', 'DateOfBirth'], ['profile', 'Height'], ['profile', 'Weight'],
+  ['profile', 'FirstName'], ['profile', 'LastName'], ['profile', 'Gender'], ['profile', 'DateOfBirth'], ['profile', 'Height'], ['profile', 'Weight'],
   ['profile', 'MaritalStatus'], ['profile', 'BloodGroup'],
   ['profile', 'Religion'], ['profile', 'Caste'], ['profile', 'MotherTongue'],
   ['education', 'Qualification'], ['education', 'PassingYear'],
@@ -201,7 +202,7 @@ export default function ProfileBuilderPage() {
 
   async function handleNext() {
     let ok = true;
-    if (step === 0) ok = await saveSection('profile', { Gender: data.profile.Gender, DateOfBirth: data.profile.DateOfBirth, Height: data.profile.Height, Weight: data.profile.Weight, MaritalStatus: data.profile.MaritalStatus, BloodGroup: data.profile.BloodGroup });
+    if (step === 0) ok = await saveSection('profile', { FirstName: data.profile.FirstName, LastName: data.profile.LastName, Gender: data.profile.Gender, DateOfBirth: data.profile.DateOfBirth, Height: data.profile.Height, Weight: data.profile.Weight, MaritalStatus: data.profile.MaritalStatus, BloodGroup: data.profile.BloodGroup });
     else if (step === 1) ok = await saveSection('profile', { Religion: data.profile.Religion, Caste: data.profile.Caste, SubCaste: data.profile.SubCaste, Sect: data.profile.Sect, MotherTongue: data.profile.MotherTongue });
     else if (step === 2) {
       ok = await saveSection('education', data.education);
@@ -284,6 +285,25 @@ export default function ProfileBuilderPage() {
                   <p className="text-sm font-medium text-white/80">Profile completeness</p>
                   <p className="mt-0.5 text-xs text-white/45">Fill in more details across all steps to improve your match quality.</p>
                 </div>
+              </div>
+
+              <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <Field label="First name" required icon={User}>
+                  <input
+                    type="text" placeholder="Your first name"
+                    value={data.profile.FirstName ?? ''}
+                    onChange={e => set('profile', { FirstName: e.target.value })}
+                    className={inputCls}
+                  />
+                </Field>
+                <Field label="Last name" icon={User}>
+                  <input
+                    type="text" placeholder="Your last name"
+                    value={data.profile.LastName ?? ''}
+                    onChange={e => set('profile', { LastName: e.target.value })}
+                    className={inputCls}
+                  />
+                </Field>
               </div>
 
               <Field label="Gender" required>
