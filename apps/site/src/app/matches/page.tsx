@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { Check, CheckCheck, HeartHandshake, Inbox, Loader2, Send, X } from 'lucide-react';
+import { Check, CheckCheck, HeartHandshake, Inbox, Loader2, MessageCircle, Send, X } from 'lucide-react';
 
 const TENANT = 'provision-test_provisiontestmatrimony';
 
@@ -117,6 +117,14 @@ export default function MatchesPage() {
               <X className="size-3.5" /> Decline
             </button>
           </div>
+        )}
+        {item.Status === 'accepted' && (
+          <Link
+            href={`/chat?userId=${id}`}
+            className="flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3.5 py-2 text-xs font-semibold text-emerald-300 transition-colors hover:bg-emerald-500/20"
+          >
+            <MessageCircle className="size-3.5" /> Chat
+          </Link>
         )}
       </div>
     );

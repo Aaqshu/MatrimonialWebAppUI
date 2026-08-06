@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import api from '@/lib/api';
 import { HeartHandshake, Loader2, MessageCircle, MessagesSquare, Send, ArrowLeft } from 'lucide-react';
 
@@ -37,7 +38,7 @@ function timeLabel(iso: string | null) {
   return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
-export default function ChatPage() {
+function ChatPage() {
   const [ready, setReady] = useState(false);
   const [meId, setMeId] = useState('');
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -48,14 +49,32 @@ export default function ChatPage() {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [toast, setToast] = useState('');
+  const [peerName, setPeerName] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!localStorage.getItem('site_token')) { window.location.href = '/'; return; }
     api.get('/site/me')
-      .then(({ data }) => { setMeId(data.UserId); setReady(true); })
+      .then(({ data }) => {
+        setMeId(data.UserId);
+        setReady(true);
+        const qUserId = searchParams.get('userId');
+        if (qUserId) {
+          setActiveId(qUserId);
+          // resolve peer display name from matches list (accepted match)
+          api.get(`/site/matches/${TENANT}`)
+            .then(({ data }) => {
+              const all = [...(data.received ?? []), ...(data.sent ?? [])];
+              const hit = all.find((m: any) => (m.FromUserId === qUserId || m.ToUserId === qUserId));
+              if (hit) setPeerName(hit.FromFirstName || hit.ToFirstName || '');
+            })
+            .catch(() => {});
+        }
+      })
       .catch((e) => { if (e.response?.status === 401) window.location.href = '/'; });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadThreads = () => {
@@ -130,6 +149,9 @@ export default function ChatPage() {
   }
 
   const activeThread = threads.find(t => t.UserId === activeId) || null;
+  // New conversation opened via ?userId= (not yet in threads list) — render from query params
+  const freshPeer = activeId && !activeThread ? { FirstName: peerName, LastName: '', City: null, PhotoUrl: null } : null;
+  const conv = activeThread || freshPeer;
   const totalUnread = threads.reduce((s, t) => s + (t.UnreadCount || 0), 0);
 
   return (
@@ -208,7 +230,7 @@ export default function ChatPage() {
 
           {/* Conversation */}
           <section className={`${activeId ? 'flex' : 'hidden sm:flex'} flex-col overflow-hidden`}>
-            {!activeThread ? (
+            {!conv ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center text-white/40">
                 <MessageCircle className="size-8 text-white/20" />
                 <p className="text-sm">Select a conversation to start chatting</p>
@@ -222,16 +244,16 @@ export default function ChatPage() {
                   >
                     <ArrowLeft className="size-4" />
                   </button>
-                  {activeThread.PhotoUrl ? (
-                    <img src={activeThread.PhotoUrl} alt={activeThread.FirstName} className="size-9 shrink-0 rounded-full object-cover" />
+                  {conv.PhotoUrl ? (
+                    <img src={conv.PhotoUrl} alt={conv.FirstName} className="size-9 shrink-0 rounded-full object-cover" />
                   ) : (
                     <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500/25 to-amber-500/25 text-xs font-semibold">
-                      {`${activeThread.FirstName?.[0] ?? ''}${activeThread.LastName?.[0] ?? ''}`.toUpperCase()}
+                      {`${conv.FirstName?.[0] ?? ''}${conv.LastName?.[0] ?? ''}`.toUpperCase()}
                     </div>
                   )}
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{activeThread.FirstName} {activeThread.LastName}</p>
-                    {activeThread.City && <p className="truncate text-xs text-white/40">{activeThread.City}</p>}
+                    <p className="truncate text-sm font-medium">{conv.FirstName} {conv.LastName}</p>
+                    {conv.City && <p className="truncate text-xs text-white/40">{conv.City}</p>}
                   </div>
                 </div>
 
@@ -297,5 +319,13 @@ export default function ChatPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ChatPageWrapper() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-background text-white/50"><Loader2 className="size-5 animate-spin" /></div>}>
+      <ChatPage />
+    </Suspense>
   );
 }
