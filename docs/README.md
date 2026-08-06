@@ -1,5 +1,11 @@
 # Matrimonial SaaS Platform — Documentation
 
+- [README](README.md) — overview, stack, live URLs
+- [API](API.md) — all API endpoints
+- [DEPLOYMENT](DEPLOYMENT.md) — server layout + troubleshooting
+- [ROADMAP](ROADMAP.md) — phase checklist
+- [BACKUPS](BACKUPS.md) — database backup & restore system
+
 Multi-tenant matrimonial SaaS platform. Admin panel + tenant websites (roadmap).
 
 ## Repo layout
