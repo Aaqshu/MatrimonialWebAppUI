@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { ArrowRight, Bell, HeartHandshake, ImagePlus, Loader2, Lock, LogOut, MessageCircle, SearchIcon, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Bell, Crown, HeartHandshake, ImagePlus, Loader2, Lock, LogOut, MessageCircle, SearchIcon, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 const TENANT = 'provision-test_provisiontestmatrimony';
 
@@ -23,6 +23,9 @@ export default function DashboardPage() {
   const [pendingInterests, setPendingInterests] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [isPremium, setIsPremium] = useState(false);
+  const [planName, setPlanName] = useState<string | null>(null);
+  const [expiresOn, setExpiresOn] = useState<string | null>(null);
 
   useEffect(() => {
     api.get('/site/me')
@@ -50,6 +53,12 @@ export default function DashboardPage() {
       })
       .then((nf: any) => {
         setUnreadNotifications(nf?.data?.unreadCount ?? 0);
+        return api.get(`/site/membership/${TENANT}`).catch(() => null);
+      })
+      .then((mem: any) => {
+        setIsPremium(!!mem?.data?.isPremium);
+        setPlanName(mem?.data?.subscription?.PlanName ?? null);
+        setExpiresOn(mem?.data?.subscription?.ExpiresOn ?? null);
       })
       .catch(() => { window.location.href = '/'; });
   }, []);
@@ -189,7 +198,7 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Link href="/chat" className="block rounded-2xl border border-white/8 bg-white/[0.03] p-6 transition-all duration-200 hover:border-emerald-500/30 hover:bg-white/[0.05]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3.5">
@@ -228,6 +237,28 @@ export default function DashboardPage() {
                   {unreadNotifications}
                 </span>
               )}
+            </div>
+          </Link>
+          <Link
+            href="/plans"
+            className={`block rounded-2xl border p-6 transition-all duration-200 ${
+              isPremium
+                ? 'border-amber-500/25 bg-gradient-to-br from-amber-500/10 to-transparent hover:border-amber-500/50'
+                : 'border-white/8 bg-white/[0.03] hover:border-amber-500/30 hover:bg-white/[0.05]'
+            }`}
+          >
+            <div className="flex items-center gap-3.5">
+              <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${isPremium ? 'bg-amber-500 text-amber-950 shadow-lg shadow-amber-500/20' : 'bg-white/5 text-white/60'}`}>
+                <Crown className="size-5" />
+              </div>
+              <div>
+                <p className="font-medium">Membership</p>
+                <p className={`mt-0.5 text-sm ${isPremium ? 'text-amber-300' : 'text-white/50'}`}>
+                  {isPremium
+                    ? `${planName}${expiresOn ? ` · expires ${new Date(expiresOn).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}` : ''}`
+                    : 'Upgrade to Gold'}
+                </p>
+              </div>
             </div>
           </Link>
         </div>
