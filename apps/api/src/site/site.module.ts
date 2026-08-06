@@ -13,6 +13,8 @@ import { SiteViewersController } from './viewers.controller';
 import { SiteMessagesController } from './messages.controller';
 import { SiteNotificationsController } from './notifications.controller';
 import { SiteMonetizationController } from './monetization.controller';
+import { SiteReportsController } from './reports.controller';
+import { SiteStoriesController } from './stories.controller';
 import { TenantDbService } from './tenant-db.service';
 import { OtpDeliveryService } from './otp-delivery.service';
 
@@ -26,7 +28,7 @@ import { OtpDeliveryService } from './otp-delivery.service';
       }),
     }),
   ],
-  controllers: [SiteController, SiteProfileController, SitePhotosController, SiteVerificationController, SitePrivacyController, SiteSearchController, SiteDiscoveryController, SiteSuggestionsController, SiteViewersController, SiteMessagesController, SiteNotificationsController, SiteMonetizationController],
+  controllers: [SiteController, SiteProfileController, SitePhotosController, SiteVerificationController, SitePrivacyController, SiteSearchController, SiteDiscoveryController, SiteSuggestionsController, SiteViewersController, SiteMessagesController, SiteNotificationsController, SiteMonetizationController, SiteReportsController, SiteStoriesController],
   providers: [TenantDbService, OtpDeliveryService],
   exports: [TenantDbService],
 })
