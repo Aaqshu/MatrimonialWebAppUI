@@ -1,7 +1,9 @@
 import { Controller, Get, Headers, Param } from '@nestjs/common';
+import { Public } from '../auth/public.decorator';
 import { TenantDbService } from './tenant-db.service';
 
 // Public success stories — published only, no auth required.
+@Public()
 @Controller('site/stories')
 export class SiteStoriesController {
   constructor(private tenantDb: TenantDbService) {}

@@ -89,8 +89,9 @@ describe('Phase 6 — Trust: Reports, Stories, Moderation (e2e)', () => {
   describe('Success stories', () => {
     let storyId: string;
 
-    it('stories list is empty initially', async () => {
-      const res = await authed('get', `/site/stories/${TENANT}`, tokenA).expect(200);
+    it('stories list is empty initially (public, no auth)', async () => {
+      const res = await request(app.getHttpServer())
+        .get(`/site/stories/${TENANT}`).expect(200);
       expect(Array.isArray(res.body.stories)).toBe(true);
     });
 
@@ -110,7 +111,8 @@ describe('Phase 6 — Trust: Reports, Stories, Moderation (e2e)', () => {
     });
 
     it('stories list shows the published story', async () => {
-      const res = await authed('get', `/site/stories/${TENANT}`, tokenA).expect(200);
+      const res = await request(app.getHttpServer())
+        .get(`/site/stories/${TENANT}`).expect(200);
       const hit = res.body.stories.find((s: any) => s.StoryId === storyId);
       expect(hit).toBeDefined();
       expect(hit.FirstName1).toBeDefined();
@@ -121,7 +123,8 @@ describe('Phase 6 — Trust: Reports, Stories, Moderation (e2e)', () => {
       const res = await authed('patch', `/admin/moderation/stories/${storyId}`, adminToken)
         .send({ IsPublished: false }).expect(200);
       expect(res.body.IsPublished).toBe(false);
-      const list = await authed('get', `/site/stories/${TENANT}`, tokenA).expect(200);
+      const list = await request(app.getHttpServer())
+        .get(`/site/stories/${TENANT}`).expect(200);
       expect(list.body.stories.some((s: any) => s.StoryId === storyId)).toBe(false);
     });
   });
