@@ -17,6 +17,7 @@ import {
   Settings,
   LogOut,
   ShieldCheck,
+  DatabaseBackup,
 } from 'lucide-react';
 
 const navItems = [
@@ -28,6 +29,7 @@ const navItems = [
   { href: '/verifications', label: 'Verifications', icon: ShieldCheck },
   { href: '/templates', label: 'Email Templates', icon: Mail },
   { href: '/admin-users', label: 'Admin Users', icon: Users },
+  { href: '/backups', label: 'Backups', icon: DatabaseBackup },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 

@@ -15,6 +15,7 @@ import { AdminUsersModule } from './admin/admin-users/admin-users.module';
 import { SubscriptionsModule } from './admin/subscriptions/subscriptions.module';
 import { PaymentsModule } from './admin/payments/payments.module';
 import { VerificationsModule } from './admin/verifications/verifications.module';
+import { BackupsModule } from './admin/backups/backups.module';
 import { SiteModule } from './site/site.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
@@ -35,6 +36,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     SubscriptionsModule,
     PaymentsModule,
     VerificationsModule,
+    BackupsModule,
     SiteModule,
   ],
   providers: [
