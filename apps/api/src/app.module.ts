@@ -19,6 +19,7 @@ import { BackupsModule } from './admin/backups/backups.module';
 import { ModerationModule } from './admin/moderation/moderation.module';
 import { SiteModule } from './site/site.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     BackupsModule,
     ModerationModule,
     SiteModule,
+    HealthModule,
   ],
   providers: [
     Reflector,
