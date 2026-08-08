@@ -1,7 +1,10 @@
 version: "3.8"
+
 services:
   postgres:
     image: postgres:16-alpine
+    container_name: matrimonial_postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -10,10 +13,57 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./packages/database/prisma/migrations:/docker-entrypoint-initdb.d
+      - ./initdb:/docker-entrypoint-initdb.d
+
   redis:
     image: redis:7-alpine
+    container_name: matrimonial_redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
+
+  api:
+    build: ./apps/api
+    container_name: matrimonial_api
+    restart: unless-stopped
+    environment:
+      ADMIN_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/matrimonial_admin
+      TENANT_DATABASE_URL: postgresql://postgres:postgres@postgres:5432
+      JWT_SECRET: admin-secret-dev
+      PORT: 3001
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+    volumes:
+      - uploads_data:/app/apps/api/uploads
+    depends_on:
+      - postgres
+      - redis
+
+  web:
+    build:
+      context: ./apps/web
+      args:
+        NEXT_PUBLIC_API_URL: http://178.212.35.171:3001
+    container_name: matrimonial_web
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    depends_on:
+      - api
+
+  site:
+    build:
+      context: ./apps/site
+      args:
+        NEXT_PUBLIC_API_URL: http://178.212.35.171:3001
+    container_name: matrimonial_site
+    restart: unless-stopped
+    ports:
+      - "3200:3200"
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
+  uploads_data:
