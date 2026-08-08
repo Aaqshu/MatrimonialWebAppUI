@@ -23,7 +23,9 @@ services:
       - "6379:6379"
 
   api:
-    build: ./apps/api
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
     container_name: matrimonial_api
     restart: unless-stopped
     environment:

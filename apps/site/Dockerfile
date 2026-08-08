@@ -24,6 +24,8 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.ts ./
 
+RUN chown -R node:node /app
+
 USER node
 EXPOSE 3200
 CMD ["node_modules/.bin/next", "start", "-p", "3200"]

@@ -25,6 +25,9 @@ RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/packages/database /app/packages/database
 
+# uploads dir must be writable by node user (static assets)
+RUN mkdir -p /app/apps/api/uploads && chown -R node:node /app/apps/api
+
 USER node
 EXPOSE 3001
 CMD ["node", "dist/main.js"]
